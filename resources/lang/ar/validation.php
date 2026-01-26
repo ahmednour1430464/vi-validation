@@ -1,0 +1,48 @@
+<?php
+
+return [
+    'required' => 'حقل :attribute مطلوب.',
+    'string' => 'يجب أن يكون :attribute نصاً.',
+    'integer' => 'يجب أن يكون :attribute عدداً صحيحاً.',
+    'numeric' => 'يجب أن يكون :attribute رقماً.',
+    'boolean' => 'يجب أن يكون :attribute إما صحيح أو خطأ.',
+    'array' => 'يجب أن يكون :attribute مصفوفة.',
+    'date' => ':attribute ليس تاريخاً صحيحاً.',
+    'json' => 'يجب أن يكون :attribute نص JSON صالح.',
+    'email' => 'يجب أن يكون :attribute عنوان بريد إلكتروني صحيح.',
+    'alpha' => 'يجب أن يحتوي :attribute على أحرف فقط.',
+    'alpha_num' => 'يجب أن يحتوي :attribute على أحرف وأرقام فقط.',
+    'regex' => 'صيغة :attribute غير صحيحة.',
+    'url' => 'يجب أن يكون :attribute رابط URL صحيح.',
+    'uuid' => 'يجب أن يكون :attribute UUID صالح.',
+    'ip' => 'يجب أن يكون :attribute عنوان IP صحيح.',
+    'in' => ':attribute المحدد غير صحيح.',
+    'not_in' => ':attribute المحدد غير صحيح.',
+    'between' => [
+        'numeric' => 'يجب أن يكون :attribute بين :min و :max.',
+        'string' => 'يجب أن يكون :attribute بين :min و :max حرفاً.',
+        'array' => 'يجب أن يحتوي :attribute على :min إلى :max عناصر.',
+    ],
+    'size' => [
+        'numeric' => 'يجب أن يكون :attribute مساوياً لـ :size.',
+        'string' => 'يجب أن يكون :attribute :size حرفاً.',
+        'array' => 'يجب أن يحتوي :attribute على :size عناصر.',
+    ],
+    'min' => [
+        'numeric' => 'يجب أن يكون :attribute على الأقل :min.',
+        'string' => 'يجب أن يكون :attribute على الأقل :min حرفاً.',
+        'array' => 'يجب أن يحتوي :attribute على الأقل على :min عناصر.',
+    ],
+    'max' => [
+        'numeric' => 'يجب أن لا يكون :attribute أكبر من :max.',
+        'string' => 'يجب أن لا يكون :attribute أكثر من :max حرفاً.',
+        'array' => 'يجب أن لا يحتوي :attribute على أكثر من :max عناصر.',
+    ],
+    'confirmed' => 'تأكيد :attribute غير متطابق.',
+    'same' => 'يجب أن يتطابق :attribute مع :other.',
+    'different' => 'يجب أن يختلف :attribute عن :other.',
+    'file' => 'يجب أن يكون :attribute ملفاً.',
+    'image' => 'يجب أن يكون :attribute صورة.',
+    'mimes' => 'يجب أن يكون :attribute ملفاً من نوع: :values.',
+    'max_file_size' => 'يجب أن لا يكون حجم :attribute أكبر من :max كيلوبايت.',
+];

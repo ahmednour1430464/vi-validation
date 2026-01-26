@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vi\Validation\Rules;
+
+use Vi\Validation\Execution\ValidationContext;
+
+final class NumericRule implements RuleInterface
+{
+    public function validate(mixed $value, string $field, ValidationContext $context): ?array
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (!is_numeric($value)) {
+            return ['rule' => 'numeric'];
+        }
+
+        return null;
+    }
+}

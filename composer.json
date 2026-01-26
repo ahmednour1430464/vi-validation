@@ -9,12 +9,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Vi\\\\Validation\\\\": "src/"
+            "Vi\\Validation\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Vi\\\\Validation\\\\Tests\\\\": "tests/"
+            "Vi\\Validation\\Tests\\": "tests/"
         }
     },
     "require-dev": {

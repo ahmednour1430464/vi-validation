@@ -1,0 +1,48 @@
+<?php
+
+return [
+    'required' => 'The :attribute field is required.',
+    'string' => 'The :attribute must be a string.',
+    'integer' => 'The :attribute must be an integer.',
+    'numeric' => 'The :attribute must be a number.',
+    'boolean' => 'The :attribute field must be true or false.',
+    'array' => 'The :attribute must be an array.',
+    'date' => 'The :attribute is not a valid date.',
+    'json' => 'The :attribute must be a valid JSON string.',
+    'email' => 'The :attribute must be a valid email address.',
+    'alpha' => 'The :attribute must only contain letters.',
+    'alpha_num' => 'The :attribute must only contain letters and numbers.',
+    'regex' => 'The :attribute format is invalid.',
+    'url' => 'The :attribute must be a valid URL.',
+    'uuid' => 'The :attribute must be a valid UUID.',
+    'ip' => 'The :attribute must be a valid IP address.',
+    'in' => 'The selected :attribute is invalid.',
+    'not_in' => 'The selected :attribute is invalid.',
+    'between' => [
+        'numeric' => 'The :attribute must be between :min and :max.',
+        'string' => 'The :attribute must be between :min and :max characters.',
+        'array' => 'The :attribute must have between :min and :max items.',
+    ],
+    'size' => [
+        'numeric' => 'The :attribute must be :size.',
+        'string' => 'The :attribute must be :size characters.',
+        'array' => 'The :attribute must contain :size items.',
+    ],
+    'min' => [
+        'numeric' => 'The :attribute must be at least :min.',
+        'string' => 'The :attribute must be at least :min characters.',
+        'array' => 'The :attribute must have at least :min items.',
+    ],
+    'max' => [
+        'numeric' => 'The :attribute must not be greater than :max.',
+        'string' => 'The :attribute must not be greater than :max characters.',
+        'array' => 'The :attribute must not have more than :max items.',
+    ],
+    'confirmed' => 'The :attribute confirmation does not match.',
+    'same' => 'The :attribute and :other must match.',
+    'different' => 'The :attribute and :other must be different.',
+    'file' => 'The :attribute must be a file.',
+    'image' => 'The :attribute must be an image.',
+    'mimes' => 'The :attribute must be a file of type: :values.',
+    'max_file_size' => 'The :attribute must not be greater than :max kilobytes.',
+];
