@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vi\Validation\Rules;
+
+use Vi\Validation\Execution\ValidationContext;
+
+final class RequiredUnlessRule implements RuleInterface
+{
+    private string $otherField;
+
+    /** @var list<mixed> */
+    private array $values;
+
+    /**
+     * @param list<mixed> $values
+     */
+    public function __construct(string $otherField, array $values)
+    {
+        $this->otherField = $otherField;
+        $this->values = $values;
+    }
+
+    public function validate(mixed $value, string $field, ValidationContext $context): ?array
+    {
+        $otherValue = $context->getValue($this->otherField);
+
+        // If the other field's value is in the specified values, this field is NOT required
+        if (in_array($otherValue, $this->values, true)) {
+            return null;
+        }
+
+        // Other field doesn't match specified values, so this field is required
+        if ($this->isEmpty($value)) {
+            return [
+                'rule' => 'required_unless',
+                'params' => [
+                    'other' => $this->otherField,
+                    'values' => implode(', ', $this->values),
+                ],
+            ];
+        }
+
+        return null;
+    }
+
+    private function isEmpty(mixed $value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (is_string($value) && $value === '') {
+            return true;
+        }
+
+        if (is_array($value) && $value === []) {
+            return true;
+        }
+
+        return false;
+    }
+}

@@ -11,6 +11,8 @@ final class CompiledSchema
     /** @var list<CompiledField> */
     private array $fields;
 
+    private ?ValidatorEngine $engine = null;
+
     /** @param list<CompiledField> $fields */
     private function __construct(array $fields)
     {
@@ -37,5 +39,19 @@ final class CompiledSchema
     public function getFields(): array
     {
         return $this->fields;
+    }
+
+    /**
+     * Validate data against this schema.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function validate(array $data): ValidationResult
+    {
+        if ($this->engine === null) {
+            $this->engine = new ValidatorEngine();
+        }
+
+        return $this->engine->validate($this, $data);
     }
 }

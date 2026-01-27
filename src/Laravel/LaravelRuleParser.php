@@ -4,21 +4,36 @@ declare(strict_types=1);
 
 namespace Vi\Validation\Laravel;
 
+use Vi\Validation\Rules\AcceptedRule;
+use Vi\Validation\Rules\AfterOrEqualRule;
+use Vi\Validation\Rules\AfterRule;
 use Vi\Validation\Rules\AlphanumericRule;
 use Vi\Validation\Rules\AlphaRule;
 use Vi\Validation\Rules\ArrayRule;
+use Vi\Validation\Rules\BeforeOrEqualRule;
+use Vi\Validation\Rules\BeforeRule;
 use Vi\Validation\Rules\BetweenRule;
 use Vi\Validation\Rules\BooleanRule;
 use Vi\Validation\Rules\ConfirmedRule;
 use Vi\Validation\Rules\DateRule;
+use Vi\Validation\Rules\DeclinedRule;
 use Vi\Validation\Rules\DifferentRule;
+use Vi\Validation\Rules\DigitsBetweenRule;
+use Vi\Validation\Rules\DigitsRule;
+use Vi\Validation\Rules\DistinctRule;
 use Vi\Validation\Rules\EmailRule;
+use Vi\Validation\Rules\EndsWithRule;
+use Vi\Validation\Rules\FilledRule;
 use Vi\Validation\Rules\FileRule;
+use Vi\Validation\Rules\GreaterThanOrEqualRule;
+use Vi\Validation\Rules\GreaterThanRule;
 use Vi\Validation\Rules\ImageRule;
 use Vi\Validation\Rules\InRule;
 use Vi\Validation\Rules\IntegerTypeRule;
 use Vi\Validation\Rules\IpRule;
 use Vi\Validation\Rules\JsonRule;
+use Vi\Validation\Rules\LessThanOrEqualRule;
+use Vi\Validation\Rules\LessThanRule;
 use Vi\Validation\Rules\MaxFileSizeRule;
 use Vi\Validation\Rules\MaxRule;
 use Vi\Validation\Rules\MimesRule;
@@ -26,11 +41,20 @@ use Vi\Validation\Rules\MinRule;
 use Vi\Validation\Rules\NotInRule;
 use Vi\Validation\Rules\NullableRule;
 use Vi\Validation\Rules\NumericRule;
+use Vi\Validation\Rules\PresentRule;
+use Vi\Validation\Rules\ProhibitedRule;
 use Vi\Validation\Rules\RegexRule;
+use Vi\Validation\Rules\RequiredIfRule;
 use Vi\Validation\Rules\RequiredRule;
+use Vi\Validation\Rules\RequiredUnlessRule;
+use Vi\Validation\Rules\RequiredWithAllRule;
+use Vi\Validation\Rules\RequiredWithoutAllRule;
+use Vi\Validation\Rules\RequiredWithoutRule;
+use Vi\Validation\Rules\RequiredWithRule;
 use Vi\Validation\Rules\RuleInterface;
 use Vi\Validation\Rules\SameRule;
 use Vi\Validation\Rules\SizeRule;
+use Vi\Validation\Rules\StartsWithRule;
 use Vi\Validation\Rules\StringTypeRule;
 use Vi\Validation\Rules\UrlRule;
 use Vi\Validation\Rules\UuidRule;
@@ -85,6 +109,16 @@ final class LaravelRuleParser
             // Core rules
             'required' => new RequiredRule(),
             'nullable' => new NullableRule(),
+            'filled' => new FilledRule(),
+            'present' => new PresentRule(),
+            
+            // Conditional required rules
+            'required_if' => isset($params[0], $params[1]) ? new RequiredIfRule($params[0], array_slice($params, 1)) : null,
+            'required_unless' => isset($params[0], $params[1]) ? new RequiredUnlessRule($params[0], array_slice($params, 1)) : null,
+            'required_with' => !empty($params) ? new RequiredWithRule($params) : null,
+            'required_without' => !empty($params) ? new RequiredWithoutRule($params) : null,
+            'required_with_all' => !empty($params) ? new RequiredWithAllRule($params) : null,
+            'required_without_all' => !empty($params) ? new RequiredWithoutAllRule($params) : null,
             
             // Type rules
             'string' => new StringTypeRule(),
@@ -106,6 +140,10 @@ final class LaravelRuleParser
             'ip' => new IpRule(),
             'ipv4' => new IpRule('v4'),
             'ipv6' => new IpRule('v6'),
+            'starts_with' => !empty($params) ? new StartsWithRule($params) : null,
+            'ends_with' => !empty($params) ? new EndsWithRule($params) : null,
+            'digits' => isset($params[0]) ? new DigitsRule((int) $params[0]) : null,
+            'digits_between' => isset($params[0], $params[1]) ? new DigitsBetweenRule((int) $params[0], (int) $params[1]) : null,
             
             // Size rules
             'min' => isset($params[0]) ? new MinRule((float) $params[0]) : null,
@@ -119,6 +157,29 @@ final class LaravelRuleParser
             'confirmed' => new ConfirmedRule(),
             'same' => isset($params[0]) ? new SameRule($params[0]) : null,
             'different' => isset($params[0]) ? new DifferentRule($params[0]) : null,
+            'gt' => isset($params[0]) ? new GreaterThanRule($params[0]) : null,
+            'gte' => isset($params[0]) ? new GreaterThanOrEqualRule($params[0]) : null,
+            'lt' => isset($params[0]) ? new LessThanRule($params[0]) : null,
+            'lte' => isset($params[0]) ? new LessThanOrEqualRule($params[0]) : null,
+            
+            // Date comparison rules
+            'after' => isset($params[0]) ? new AfterRule($params[0]) : null,
+            'after_or_equal' => isset($params[0]) ? new AfterOrEqualRule($params[0]) : null,
+            'before' => isset($params[0]) ? new BeforeRule($params[0]) : null,
+            'before_or_equal' => isset($params[0]) ? new BeforeOrEqualRule($params[0]) : null,
+            
+            // Acceptance rules
+            'accepted' => new AcceptedRule(),
+            'declined' => new DeclinedRule(),
+            
+            // Prohibited rule
+            'prohibited' => new ProhibitedRule(),
+            
+            // Array rules
+            'distinct' => new DistinctRule(
+                in_array('strict', $params, true),
+                in_array('ignore_case', $params, true)
+            ),
             
             // File rules
             'file' => new FileRule(),

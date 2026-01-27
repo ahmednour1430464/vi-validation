@@ -9,17 +9,25 @@ final class ErrorCollector
     /** @var array<string, list<array{rule: string, message: string|null}>> */
     private array $errors = [];
 
+    private int $errorCount = 0;
+
     public function add(string $field, string $rule, ?string $message = null): void
     {
         $this->errors[$field][] = [
             'rule' => $rule,
             'message' => $message,
         ];
+        $this->errorCount++;
     }
 
     public function hasErrors(): bool
     {
         return $this->errors !== [];
+    }
+
+    public function count(): int
+    {
+        return $this->errorCount;
     }
 
     /**

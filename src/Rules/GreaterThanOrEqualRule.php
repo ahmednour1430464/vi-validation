@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vi\Validation\Rules;
+
+use Vi\Validation\Execution\ValidationContext;
+
+final class GreaterThanOrEqualRule implements RuleInterface
+{
+    private string $otherField;
+
+    public function __construct(string $otherField)
+    {
+        $this->otherField = $otherField;
+    }
+
+    public function validate(mixed $value, string $field, ValidationContext $context): ?array
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $otherValue = $context->getValue($this->otherField);
+
+        if ($otherValue === null) {
+            return null;
+        }
+
+        // Handle numeric comparison
+        if (is_numeric($value) && is_numeric($otherValue)) {
+            if ((float) $value < (float) $otherValue) {
+                return [
+                    'rule' => 'gte',
+                    'params' => ['value' => $this->otherField],
+                ];
+            }
+            return null;
+        }
+
+        // Handle string comparison (by length)
+        if (is_string($value) && is_string($otherValue)) {
+            if (mb_strlen($value) < mb_strlen($otherValue)) {
+                return [
+                    'rule' => 'gte',
+                    'params' => ['value' => $this->otherField],
+                ];
+            }
+            return null;
+        }
+
+        // Handle array comparison (by count)
+        if (is_array($value) && is_array($otherValue)) {
+            if (count($value) < count($otherValue)) {
+                return [
+                    'rule' => 'gte',
+                    'params' => ['value' => $this->otherField],
+                ];
+            }
+            return null;
+        }
+
+        return null;
+    }
+}

@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vi\Validation\Rules;
+
+use Vi\Validation\Execution\ValidationContext;
+
+final class RequiredIfRule implements RuleInterface
+{
+    private string $otherField;
+
+    /** @var list<mixed> */
+    private array $values;
+
+    /**
+     * @param list<mixed> $values
+     */
+    public function __construct(string $otherField, array $values)
+    {
+        $this->otherField = $otherField;
+        $this->values = $values;
+    }
+
+    public function validate(mixed $value, string $field, ValidationContext $context): ?array
+    {
+        $otherValue = $context->getValue($this->otherField);
+
+        // Check if the other field's value is in the specified values
+        if (!in_array($otherValue, $this->values, true)) {
+            // Other field doesn't match, so this field is not required
+            return null;
+        }
+
+        // Other field matches, so this field is required
+        if ($this->isEmpty($value)) {
+            return [
+                'rule' => 'required_if',
+                'params' => [
+                    'other' => $this->otherField,
+                    'values' => implode(', ', $this->values),
+                ],
+            ];
+        }
+
+        return null;
+    }
+
+    private function isEmpty(mixed $value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (is_string($value) && $value === '') {
+            return true;
+        }
+
+        if (is_array($value) && $value === []) {
+            return true;
+        }
+
+        return false;
+    }
+}

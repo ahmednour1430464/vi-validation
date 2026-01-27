@@ -34,6 +34,16 @@ final class ValidationContext
         return $level1[$second] ?? null;
     }
 
+    /**
+     * Get all validation data.
+     *
+     * @return array<string, mixed>
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
     public function addError(string $field, string $rule, ?string $message = null): void
     {
         $this->errors->add($field, $rule, $message);

@@ -72,6 +72,27 @@ public function store()
 }
 ```
 
+### Laravel (Using Facade)
+
+```php
+use Vi\\Validation\\Laravel\\Facades\\FastValidator;
+
+public function store()
+{
+    $validator = FastValidator::make(request()->all(), [
+        'email' => 'required|email',
+        'name' => 'required|string|max:100',
+    ]);
+
+    if ($validator->fails()) {
+        return back()->withErrors($validator)->withInput();
+    }
+
+    // Validated data
+    $data = $validator->validated();
+}
+```
+
 ---
 
 ## Core Concepts
@@ -116,8 +137,24 @@ $result = $validator->validate($data);
 if ($result->isValid()) {
     // OK
 } else {
+    // Get raw errors with rule names
     $errors = $result->errors();
     // $errors is: array<string, list<array{rule: string, message?: string|null}>>
+    
+    // Get formatted messages (recommended)
+    $messages = $result->messages();
+    // $messages is: array<string, list<string>>
+    // e.g., ['email' => ['The email must be a valid email address.']]
+    
+    // Get all messages as flat array
+    $allMessages = $result->allMessages();
+    // ['The email must be a valid email address.', 'The name field is required.']
+    
+    // Get first message for a field
+    $firstEmailError = $result->firstMessage('email');
+    
+    // Get very first error message
+    $firstError = $result->first();
 }
 ```
 
@@ -341,14 +378,23 @@ $failureCount = $chunked->countFailures($rows, 1000);
 
 ## Laravel Integration
 
-### Register the Service Provider
+### Auto-Discovery (Laravel 5.5+)
 
-If auto-discovery is not used, add the service provider to `config/app.php`:
+The package supports Laravel's package auto-discovery. After installing via Composer, the service provider and facade are automatically registered.
+
+### Manual Registration
+
+If auto-discovery is disabled, add the service provider to `config/app.php`:
 
 ```php
 'providers' => [
     // ...
     Vi\\Validation\\Laravel\\FastValidationServiceProvider::class,
+],
+
+'aliases' => [
+    // ...
+    'FastValidator' => Vi\\Validation\\Laravel\\Facades\\FastValidator::class,
 ],
 ```
 
@@ -470,6 +516,19 @@ The Laravel-style rules currently supported and mapped internally are:
 |------|-------------|
 | `required` | Checks for non-null, non-empty string, non-empty array |
 | `nullable` | Allows null values, skips other rules when null |
+| `filled` | Field must not be empty when present |
+| `present` | Field must be present in the input data (can be empty) |
+
+### Conditional Required Rules
+
+| Rule | Description |
+|------|-------------|
+| `required_if:field,value,...` | Required when another field equals specified value(s) |
+| `required_unless:field,value,...` | Required unless another field equals specified value(s) |
+| `required_with:field1,field2,...` | Required when any of the specified fields are present |
+| `required_without:field1,field2,...` | Required when any of the specified fields are absent |
+| `required_with_all:field1,field2,...` | Required when all specified fields are present |
+| `required_without_all:field1,field2,...` | Required when all specified fields are absent |
 
 ### Type Rules
 
@@ -497,6 +556,10 @@ The Laravel-style rules currently supported and mapped internally are:
 | `ipv4` | Value must be a valid IPv4 address |
 | `ipv6` | Value must be a valid IPv6 address |
 | `regex:pattern` | Value must match the given regex pattern |
+| `starts_with:value1,value2,...` | Value must start with one of the given values |
+| `ends_with:value1,value2,...` | Value must end with one of the given values |
+| `digits:length` | Value must be numeric and have exact length |
+| `digits_between:min,max` | Value must be numeric with length between min and max |
 
 ### Size Rules
 
@@ -516,6 +579,40 @@ The Laravel-style rules currently supported and mapped internally are:
 | `confirmed` | Field must have a matching `{field}_confirmation` field |
 | `same:field` | Value must match the specified field |
 | `different:field` | Value must differ from the specified field |
+| `gt:field` | Value must be greater than the specified field |
+| `gte:field` | Value must be greater than or equal to the specified field |
+| `lt:field` | Value must be less than the specified field |
+| `lte:field` | Value must be less than or equal to the specified field |
+
+### Date Comparison Rules
+
+| Rule | Description |
+|------|-------------|
+| `after:date` | Date must be after the given date (or field) |
+| `after_or_equal:date` | Date must be after or equal to the given date (or field) |
+| `before:date` | Date must be before the given date (or field) |
+| `before_or_equal:date` | Date must be before or equal to the given date (or field) |
+
+### Acceptance Rules
+
+| Rule | Description |
+|------|-------------|
+| `accepted` | Field must be "yes", "on", "1", true, or "true" |
+| `declined` | Field must be "no", "off", "0", false, or "false" |
+
+### Array Rules
+
+| Rule | Description |
+|------|-------------|
+| `distinct` | Array must not have duplicate values |
+| `distinct:strict` | Array must not have duplicate values (strict comparison) |
+| `distinct:ignore_case` | Array must not have duplicate values (case-insensitive) |
+
+### Prohibition Rule
+
+| Rule | Description |
+|------|-------------|
+| `prohibited` | Field must be empty or not present |
 
 ### File Rules
 
@@ -530,14 +627,19 @@ The Laravel-style rules currently supported and mapped internally are:
 
 ```php
 $rules = [
-    'name'     => 'required|string|max:100',
-    'email'    => 'required|email',
-    'age'      => 'required|integer|min:18|max:120',
-    'website'  => 'nullable|url',
-    'role'     => 'required|in:admin,user,guest',
-    'password' => 'required|string|min:8|confirmed',
-    'metadata' => 'nullable|json',
-    'avatar'   => 'nullable|image|max_file_size:2048',
+    'name'       => 'required|string|max:100',
+    'email'      => 'required|email',
+    'age'        => 'required|integer|min:18|max:120',
+    'website'    => 'nullable|url',
+    'role'       => 'required|in:admin,user,guest',
+    'password'   => 'required|string|min:8|confirmed',
+    'metadata'   => 'nullable|json',
+    'avatar'     => 'nullable|image|max_file_size:2048',
+    'start_date' => 'required|date|after:today',
+    'end_date'   => 'required|date|after:start_date',
+    'country'    => 'required_if:shipping,international',
+    'tags'       => 'nullable|array|distinct',
+    'terms'      => 'accepted',
 ];
 ```
 
@@ -814,8 +916,12 @@ composer install
 
 This runs unit tests defined under `tests/`, including:
 - Core type rules (numeric, boolean, array, date, json)
-- String validation rules (alpha, url, uuid, ip, regex)
-- Comparison rules (in, between, size, confirmed, same, different)
+- String validation rules (alpha, url, uuid, ip, regex, starts_with, ends_with, digits)
+- Comparison rules (in, between, size, confirmed, same, different, gt, gte, lt, lte)
+- Date comparison rules (after, before, after_or_equal, before_or_equal)
+- Conditional required rules (required_if, required_unless, required_with, required_without)
+- Acceptance rules (accepted, declined)
+- Other rules (filled, present, prohibited, distinct)
 - File rules (file, image, mimes)
 - Message system and localization
 - Schema caching
@@ -864,13 +970,23 @@ resources/
 ## Roadmap
 
 **Completed:**
-- Additional built-in rules (22 new rules)
-- Rich Laravel rule mapping
+- Core validation rules (27+ rules)
+- Conditional required rules (required_if, required_unless, required_with, required_without, etc.)
+- Comparison rules (gt, gte, lt, lte)
+- Date comparison rules (after, before, after_or_equal, before_or_equal)
+- String rules (starts_with, ends_with, digits, digits_between)
+- Acceptance rules (accepted, declined)
+- Other rules (filled, present, prohibited, distinct)
+- Rich Laravel rule mapping with full fluent API
 - Advanced compilation strategies and micro-optimizations
 - Detailed error messages with placeholder support
 - Localization support (English, Arabic)
 - Long-running process integration (Octane, Swoole, RoadRunner)
 - Memory-efficient streaming validation API (generators, callbacks)
+- Schema caching (array and file drivers)
+- Laravel Facade support
+- Composer package auto-discovery
+- fail_fast and max_errors configuration options
 
 **Planned:**
 - Additional language files
