@@ -166,6 +166,31 @@ final class FastValidatorFactory
 
     private function generateCacheKey(array $rules): string
     {
-        return md5(serialize($rules));
+        return md5($this->serializeRules($rules));
+    }
+
+    /**
+     * Serialize rules for cache key generation, handling closures and objects.
+     */
+    private function serializeRules(mixed $value): string
+    {
+        if ($value instanceof \Closure) {
+            // Closures get a unique ID - effectively disables caching for rules with closures
+            return 'closure:' . spl_object_id($value);
+        }
+
+        if (is_object($value)) {
+            return get_class($value) . ':' . spl_object_id($value);
+        }
+
+        if (is_array($value)) {
+            $parts = [];
+            foreach ($value as $key => $item) {
+                $parts[] = $key . ':' . $this->serializeRules($item);
+            }
+            return '[' . implode(',', $parts) . ']';
+        }
+
+        return (string) $value;
     }
 }
