@@ -349,28 +349,343 @@ if ($validator->fails()) {
 
 ---
 
-## Supported Rules (Initial Set)
+## Supported Rules
 
 The Laravel-style rules currently supported and mapped internally are:
 
-- **required** → checks for non-null, non-empty string, non-empty array
-- **string** → value must be a string
-- **integer** → value must be an integer
-- **email** → validates using `filter_var(…, FILTER_VALIDATE_EMAIL)`
-- **min:x** →
-  - For strings/arrays: minimum length/size
-  - For numeric values: minimum numeric value
-- **max:x** →
-  - For strings/arrays: maximum length/size
-  - For numeric values: maximum numeric value
+### Core Rules
 
-Example:
+| Rule | Description |
+|------|-------------|
+| `required` | Checks for non-null, non-empty string, non-empty array |
+| `nullable` | Allows null values, skips other rules when null |
+
+### Type Rules
+
+| Rule | Description |
+|------|-------------|
+| `string` | Value must be a string |
+| `integer` / `int` | Value must be an integer |
+| `numeric` | Value must be numeric (int, float, or numeric string) |
+| `boolean` / `bool` | Value must be boolean-like (true, false, 0, 1, '0', '1') |
+| `array` | Value must be an array |
+| `date` | Value must be a valid date string |
+| `date_format:format` | Value must match the specified date format |
+| `json` | Value must be a valid JSON string |
+
+### String Validation Rules
+
+| Rule | Description |
+|------|-------------|
+| `email` | Validates using `filter_var(…, FILTER_VALIDATE_EMAIL)` |
+| `alpha` | Value must contain only alphabetic characters |
+| `alpha_num` | Value must contain only alphanumeric characters |
+| `url` | Value must be a valid URL |
+| `uuid` | Value must be a valid UUID |
+| `ip` | Value must be a valid IP address (v4 or v6) |
+| `ipv4` | Value must be a valid IPv4 address |
+| `ipv6` | Value must be a valid IPv6 address |
+| `regex:pattern` | Value must match the given regex pattern |
+
+### Size Rules
+
+| Rule | Description |
+|------|-------------|
+| `min:x` | Minimum value/length/count |
+| `max:x` | Maximum value/length/count |
+| `size:x` | Exact value/length/count |
+| `between:min,max` | Value must be between min and max |
+
+### Comparison Rules
+
+| Rule | Description |
+|------|-------------|
+| `in:a,b,c` | Value must be in the given list |
+| `not_in:a,b,c` | Value must not be in the given list |
+| `confirmed` | Field must have a matching `{field}_confirmation` field |
+| `same:field` | Value must match the specified field |
+| `different:field` | Value must differ from the specified field |
+
+### File Rules
+
+| Rule | Description |
+|------|-------------|
+| `file` | Value must be a valid file |
+| `image` | Value must be an image (jpeg, png, gif, bmp, svg, webp) |
+| `mimes:jpg,png,...` | File must have one of the specified MIME types |
+| `max_file_size:kb` | File size must not exceed the specified kilobytes |
+
+### Example
 
 ```php
 $rules = [
-    'name'  => 'required|string|max:100',
-    'email' => 'required|email',
-    'age'   => 'required|integer|min:18',
+    'name'     => 'required|string|max:100',
+    'email'    => 'required|email',
+    'age'      => 'required|integer|min:18|max:120',
+    'website'  => 'nullable|url',
+    'role'     => 'required|in:admin,user,guest',
+    'password' => 'required|string|min:8|confirmed',
+    'metadata' => 'nullable|json',
+    'avatar'   => 'nullable|image|max_file_size:2048',
+];
+```
+
+---
+
+## Error Messages & Localization
+
+The library includes a full message system with localization support.
+
+### Using the Message Resolver
+
+```php
+use Vi\Validation\Messages\MessageResolver;
+use Vi\Validation\Messages\Translator;
+
+$resolver = new MessageResolver();
+
+// Get a formatted error message
+$message = $resolver->resolve('email', 'required');
+// "The email field is required."
+
+// Set custom messages
+$resolver->setCustomMessages([
+    'email.required' => 'Please provide your email address.',
+    'required' => 'This field cannot be empty.',
+]);
+
+// Set custom attribute names
+$resolver->setCustomAttributes([
+    'email' => 'email address',
+    'phone_number' => 'phone',
+]);
+```
+
+### Changing Locale
+
+```php
+use Vi\Validation\Messages\Translator;
+
+$translator = new Translator('en');
+$translator->setLocale('ar');
+
+// Add custom messages for a locale
+$translator->addMessages([
+    'required' => 'هذا الحقل مطلوب.',
+], 'ar');
+```
+
+### Built-in Languages
+
+- English (`en`)
+- Arabic (`ar`)
+
+Language files are located in `resources/lang/{locale}/validation.php`.
+
+---
+
+## Schema Caching
+
+For improved performance, compiled schemas can be cached.
+
+### In-Memory Cache
+
+```php
+use Vi\Validation\Cache\ArraySchemaCache;
+use Vi\Validation\Execution\CompiledSchema;
+
+$cache = new ArraySchemaCache();
+
+// Store a schema
+$cache->put('user-registration', $compiledSchema);
+
+// Retrieve
+$schema = $cache->get('user-registration');
+
+// With TTL (seconds)
+$cache->put('temporary', $schema, 3600);
+
+// Clear cache
+$cache->flush();
+```
+
+### File-Based Cache
+
+```php
+use Vi\Validation\Cache\FileSchemaCache;
+
+$cache = new FileSchemaCache('/path/to/cache', 3600);
+
+$cache->put('user-schema', $compiledSchema);
+$schema = $cache->get('user-schema');
+```
+
+### Precompiled Validators
+
+```php
+use Vi\Validation\Compilation\PrecompiledValidator;
+
+// Create and save
+$precompiled = new PrecompiledValidator($schema, 'user-registration');
+$precompiled->saveToFile('/path/to/validators/user-registration.compiled');
+
+// Load and use
+$validator = PrecompiledValidator::fromFile('/path/to/validators/user-registration.compiled');
+$result = $validator->validate($data);
+```
+
+### Validator Compiler
+
+```php
+use Vi\Validation\Compilation\ValidatorCompiler;
+use Vi\Validation\Cache\ArraySchemaCache;
+
+$cache = new ArraySchemaCache();
+$compiler = new ValidatorCompiler($cache, precompile: true, cachePath: '/path/to/compiled');
+
+$schema = $compiler->compile('user-rules', $rules, function ($rules) {
+    return $this->buildSchema($rules);
+});
+```
+
+---
+
+## Long-Running Process Support
+
+The library provides first-class support for long-running processes like Laravel Octane, Swoole, and RoadRunner.
+
+### Stateless Validator
+
+Use `StatelessValidator` to ensure no state leaks between requests:
+
+```php
+use Vi\Validation\Runtime\StatelessValidator;
+
+$validator = new StatelessValidator();
+
+// Each call is isolated
+$result = $validator->validate($schema, $data);
+```
+
+### Validator Pool
+
+For high-concurrency environments, use a pool of validator instances:
+
+```php
+use Vi\Validation\Runtime\ValidatorPool;
+
+$pool = new ValidatorPool(maxSize: 10);
+$pool->onWorkerStart();
+
+// Option 1: Manual acquire/release
+$validator = $pool->acquire();
+try {
+    $result = $validator->validate($schema, $data);
+} finally {
+    $pool->release($validator);
+}
+
+// Option 2: Automatic management
+$result = $pool->withValidator(function ($validator) use ($schema, $data) {
+    return $validator->validate($schema, $data);
+});
+```
+
+### Laravel Octane Integration
+
+Register the Octane service provider in `config/app.php`:
+
+```php
+'providers' => [
+    // ...
+    Vi\Validation\Laravel\Octane\OctaneValidatorProvider::class,
+],
+```
+
+The provider automatically:
+- Manages validator pool lifecycle
+- Resets context between requests
+- Warms up validators on worker start
+
+### Swoole Adapter
+
+```php
+use Vi\Validation\Runtime\Workers\SwooleAdapter;
+
+$adapter = new SwooleAdapter();
+
+$server->on('workerStart', fn() => $adapter->onWorkerStart());
+$server->on('request', function ($req, $res) use ($adapter) {
+    $adapter->onRequestStart();
+    try {
+        // Handle request
+    } finally {
+        $adapter->onRequestEnd();
+    }
+});
+```
+
+### RoadRunner Adapter
+
+```php
+use Vi\Validation\Runtime\Workers\RoadRunnerAdapter;
+
+$adapter = new RoadRunnerAdapter();
+$adapter->onWorkerStart();
+
+while ($request = $worker->waitRequest()) {
+    $adapter->handleRequest(function () use ($request) {
+        // Process request
+    });
+}
+```
+
+---
+
+## Configuration
+
+The full configuration file (`config/fast-validation.php`):
+
+```php
+<?php
+
+return [
+    // Validation mode: 'parallel' or 'override'
+    'mode' => 'parallel',
+
+    // Cache configuration
+    'cache' => [
+        'enabled' => env('FAST_VALIDATION_CACHE', true),
+        'driver' => env('FAST_VALIDATION_CACHE_DRIVER', 'array'), // array, file
+        'ttl' => env('FAST_VALIDATION_CACHE_TTL', 3600),
+        'path' => storage_path('framework/validation/cache'),
+    ],
+
+    // Compilation configuration
+    'compilation' => [
+        'precompile' => env('FAST_VALIDATION_PRECOMPILE', false),
+        'cache_path' => storage_path('framework/validation/compiled'),
+    ],
+
+    // Performance options
+    'performance' => [
+        'fail_fast' => env('FAST_VALIDATION_FAIL_FAST', false),
+        'max_errors' => env('FAST_VALIDATION_MAX_ERRORS', 100),
+        'fast_path_rules' => env('FAST_VALIDATION_FAST_PATH', true),
+    ],
+
+    // Localization
+    'localization' => [
+        'locale' => env('FAST_VALIDATION_LOCALE', 'en'),
+        'fallback_locale' => env('FAST_VALIDATION_FALLBACK_LOCALE', 'en'),
+    ],
+
+    // Long-running process support
+    'runtime' => [
+        'pooling' => env('FAST_VALIDATION_POOLING', false),
+        'pool_size' => env('FAST_VALIDATION_POOL_SIZE', 10),
+        'auto_detect' => env('FAST_VALIDATION_AUTO_DETECT', true),
+    ],
 ];
 ```
 
@@ -386,15 +701,67 @@ composer install
 ./vendor/bin/phpunit
 ```
 
-This runs unit tests defined under `tests/`, including basic validation, nested fields, nullable fields, and batch validation scenarios.
+This runs unit tests defined under `tests/`, including:
+- Core type rules (numeric, boolean, array, date, json)
+- String validation rules (alpha, url, uuid, ip, regex)
+- Comparison rules (in, between, size, confirmed, same, different)
+- File rules (file, image, mimes)
+- Message system and localization
+- Schema caching
+- Laravel rule parser
 
 ---
 
-## Roadmap (High Level)
+## Project Structure
 
-Planned future enhancements include:
+```
+src/
+├── Cache/                    # Schema caching
+│   ├── SchemaCacheInterface.php
+│   ├── ArraySchemaCache.php
+│   └── FileSchemaCache.php
+├── Compilation/              # Precompilation & optimization
+│   ├── FastPathRules.php
+│   ├── PrecompiledValidator.php
+│   └── ValidatorCompiler.php
+├── Execution/                # Core validation engine
+├── Laravel/                  # Laravel integration
+│   └── Octane/              # Octane support
+├── Messages/                 # Error messages & i18n
+│   ├── MessageBag.php
+│   ├── MessageResolver.php
+│   ├── Translator.php
+│   └── TranslatorInterface.php
+├── Rules/                    # Validation rules
+├── Runtime/                  # Long-running process support
+│   ├── ContextManager.php
+│   ├── RuntimeAwareInterface.php
+│   ├── StatelessValidator.php
+│   ├── ValidatorPool.php
+│   └── Workers/
+│       ├── RoadRunnerAdapter.php
+│       └── SwooleAdapter.php
+└── Schema/                   # Schema building
+resources/
+└── lang/                     # Translation files
+    ├── en/validation.php
+    └── ar/validation.php
+```
 
-- Additional built-in rules and richer Laravel rule mapping.
-- More advanced compilation strategies and micro-optimizations.
-- More detailed error messages and localization support.
-- Deeper integration options for long-running processes (Octane, Swoole, RoadRunner).
+---
+
+## Roadmap
+
+**Completed:**
+- Additional built-in rules (22 new rules)
+- Rich Laravel rule mapping
+- Advanced compilation strategies and micro-optimizations
+- Detailed error messages with placeholder support
+- Localization support (English, Arabic)
+- Long-running process integration (Octane, Swoole, RoadRunner)
+
+**Planned:**
+- Additional language files
+- Redis cache driver
+- Rule dependency resolution
+- Async validation support
