@@ -226,6 +226,117 @@ $chunked->validateInChunks($rows, 1000, function (int $chunkIndex, array $result
 });
 ```
 
+### Memory-Efficient Streaming Validation
+
+For large datasets (10,000+ rows), avoid `validateMany()` as it materializes all results in memory. Instead, use the streaming APIs:
+
+#### Generator-Based Streaming (Recommended)
+
+The `stream()` method yields results one at a time, allowing PHP to garbage collect each result after processing:
+
+```php
+use Vi\Validation\SchemaValidator;
+use Vi\Validation\Validator;
+
+$schema = Validator::schema()
+    ->field('id')->required()->integer()->end()
+    ->field('email')->required()->email()->end()
+    ->compile();
+
+$validator = new SchemaValidator($schema);
+
+// Stream 100,000 rows with O(1) memory usage
+foreach ($validator->stream($rows) as $index => $result) {
+    if (!$result->isValid()) {
+        // Handle error - result is garbage collected after this iteration
+        log_error("Row $index failed", $result->errors());
+    }
+}
+```
+
+#### Callback-Based Processing
+
+The `each()` method processes results immediately without storing them:
+
+```php
+$validator->each($rows, function ($result, $index) {
+    if (!$result->isValid()) {
+        Log::error("Row $index failed", $result->errors());
+    }
+});
+```
+
+#### Stream Only Failures
+
+For error reporting where you only care about failures:
+
+```php
+// Only yields failed validation results
+foreach ($validator->failures($rows) as $index => $result) {
+    echo "Row $index failed: " . json_encode($result->errors()) . "\n";
+}
+```
+
+#### Fail-Fast Validation
+
+Stop at the first failure:
+
+```php
+$firstError = $validator->firstFailure($rows);
+
+if ($firstError !== null) {
+    throw new ValidationException($firstError->errors());
+}
+```
+
+#### Check All Valid
+
+Memory-efficient way to check if all rows pass:
+
+```php
+if ($validator->allValid($rows)) {
+    // All 100,000 rows passed validation
+    $this->processImport($rows);
+}
+```
+
+#### Chunked Streaming
+
+For very large datasets where you need batch processing with controlled memory:
+
+```php
+use Vi\Validation\Execution\ChunkedValidator;
+
+$chunked = new ChunkedValidator($validator);
+
+// Stream chunks of BatchValidationResult
+foreach ($chunked->streamChunks($rows, 1000) as $chunkIndex => $batchResult) {
+    if (!$batchResult->allValid()) {
+        foreach ($batchResult->failures() as $result) {
+            // Handle failures in this chunk
+        }
+    }
+}
+
+// Or stream only failures with original row indices
+foreach ($chunked->streamFailures($rows, 1000) as $originalIndex => $result) {
+    echo "Row $originalIndex failed\n";
+}
+
+// Count failures without storing results
+$failureCount = $chunked->countFailures($rows, 1000);
+```
+
+#### Memory Comparison
+
+| Method | Memory Usage | Use Case |
+|--------|--------------|----------|
+| `validateMany()` | O(n) - stores all results | Small datasets (<10k rows) |
+| `stream()` | O(1) - yields one at a time | Large datasets, ETL |
+| `each()` | O(1) - callback, no storage | Fire-and-forget |
+| `failures()` | O(1) - yields failures only | Error reporting |
+| `streamChunks()` | O(chunk) - controlled batches | Batch inserts |
+
 ---
 
 ## Laravel Integration
@@ -759,6 +870,7 @@ resources/
 - Detailed error messages with placeholder support
 - Localization support (English, Arabic)
 - Long-running process integration (Octane, Swoole, RoadRunner)
+- Memory-efficient streaming validation API (generators, callbacks)
 
 **Planned:**
 - Additional language files
