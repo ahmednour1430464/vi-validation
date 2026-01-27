@@ -33,13 +33,13 @@ final class FastValidatorFactory
     /**
      * Mirror Laravel's Validator::make signature at a high level.
      *
-     * @param array<string, mixed> $data
+     * @param iterable<string, mixed> $data
      * @param array<string, mixed> $rules
      * @param array<string, string> $messages Custom error messages
      * @param array<string, string> $attributes Custom attribute names
      */
     public function make(
-        array $data,
+        iterable $data,
         array $rules,
         array $messages = [],
         array $attributes = []

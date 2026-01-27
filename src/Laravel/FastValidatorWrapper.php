@@ -15,8 +15,11 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 {
     private SchemaValidator $validator;
 
-    /** @var array<string, mixed> */
-    private array $data;
+    /** @var iterable<string, mixed> */
+    private iterable $data;
+
+    /** @var array<string, mixed>|null Materialized data cache */
+    private ?array $materializedData = null;
 
     /** @var array<string, mixed> */
     private array $rules = [];
@@ -34,10 +37,33 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     private bool $stopOnFirstFailure = false;
 
-    public function __construct(SchemaValidator $validator, array $data)
+    /**
+     * @param iterable<string, mixed> $data Array or generator of data to validate
+     */
+    public function __construct(SchemaValidator $validator, iterable $data)
     {
         $this->validator = $validator;
         $this->data = $data;
+    }
+
+    /**
+     * Materialize the data to an array if it's a generator/iterator.
+     *
+     * @return array<string, mixed>
+     */
+    private function materializeData(): array
+    {
+        if ($this->materializedData !== null) {
+            return $this->materializedData;
+        }
+
+        if (is_array($this->data)) {
+            $this->materializedData = $this->data;
+        } else {
+            $this->materializedData = iterator_to_array($this->data);
+        }
+
+        return $this->materializedData;
     }
 
     public function fails(): bool
@@ -48,7 +74,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
     public function passes(): bool
     {
         if ($this->result === null) {
-            $this->result = $this->validator->validate($this->data);
+            $this->result = $this->validator->validate($this->materializeData());
             
             // Execute after callbacks
             foreach ($this->afterCallbacks as $callback) {
@@ -100,7 +126,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
             throw new ValidationException($this);
         }
 
-        return $this->data;
+        return $this->materializeData();
     }
 
     public function validate(): array
@@ -109,7 +135,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
             throw new ValidationException($this);
         }
 
-        return $this->data;
+        return $this->materializeData();
     }
 
     public function failed(): array
@@ -130,12 +156,29 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     public function getData()
     {
+        return $this->materializeData();
+    }
+
+    /**
+     * Get the raw iterable data without materializing.
+     *
+     * Useful when you need to pass the original generator/iterator
+     * to streaming methods without consuming it.
+     *
+     * @return iterable<string, mixed>
+     */
+    public function getRawData(): iterable
+    {
         return $this->data;
     }
 
+    /**
+     * @param iterable<string, mixed> $data
+     */
     public function setData($data)
     {
         $this->data = $data;
+        $this->materializedData = null;
         $this->result = null;
     }
 
