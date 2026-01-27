@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vi\Validation\Laravel;
 
+use Closure;
 use Vi\Validation\Rules\AcceptedRule;
 use Vi\Validation\Rules\AfterOrEqualRule;
 use Vi\Validation\Rules\AfterRule;
@@ -14,6 +15,7 @@ use Vi\Validation\Rules\BeforeOrEqualRule;
 use Vi\Validation\Rules\BeforeRule;
 use Vi\Validation\Rules\BetweenRule;
 use Vi\Validation\Rules\BooleanRule;
+use Vi\Validation\Rules\ClosureRule;
 use Vi\Validation\Rules\ConfirmedRule;
 use Vi\Validation\Rules\DateRule;
 use Vi\Validation\Rules\DeclinedRule;
@@ -62,7 +64,7 @@ use Vi\Validation\Rules\UuidRule;
 final class LaravelRuleParser
 {
     /**
-     * @param string|array<int, string> $definition
+     * @param string|array<int, string|Closure|RuleInterface> $definition
      * @return list<RuleInterface>
      */
     public function parse(string|array $definition): array
@@ -72,6 +74,18 @@ final class LaravelRuleParser
         $parts = is_array($definition) ? $definition : explode('|', $definition);
 
         foreach ($parts as $part) {
+            // Handle closure rules
+            if ($part instanceof Closure) {
+                $rules[] = new ClosureRule($part);
+                continue;
+            }
+
+            // Handle RuleInterface instances directly
+            if ($part instanceof RuleInterface) {
+                $rules[] = $part;
+                continue;
+            }
+
             if ($part === '') {
                 continue;
             }
