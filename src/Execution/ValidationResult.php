@@ -83,4 +83,16 @@ final class ValidationResult
         $all = $this->allMessages();
         return $all[0] ?? null;
     }
+
+    /**
+     * Convert the validation result to a string.
+     */
+    public function __toString(): string
+    {
+        if ($this->isValid()) {
+            return 'Validation passed.';
+        }
+
+        return implode("\n", $this->allMessages());
+    }
 }
