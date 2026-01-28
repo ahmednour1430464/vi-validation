@@ -21,10 +21,10 @@ final class LaravelValidatorAdapter implements LaravelValidatorFactory
     /**
      * Create a new Validator instance.
      *
-     * @param array<string, mixed> $data
-     * @param array<string, mixed> $rules
+     * @param iterable<array<string, mixed>> $rows Rows to validate
+     * @param array<string, mixed> $rules Validation rules
      */
-    public function make(array $data, array $rules, array $messages = [], array $customAttributes = [])
+    public function make(iterable $data, array $rules, array $messages = [], array $customAttributes = [])
     {
         // For now, only use the fast engine for simple rule sets; otherwise, fall back.
         // This can be extended later with a richer capability matrix.
