@@ -56,7 +56,7 @@ final class ValidatorEngine
             }
         }
 
-        return new ValidationResult($errors, $this->messageResolver);
+        return new ValidationResult($errors, $data, $this->messageResolver);
     }
 
     public function setFailFast(bool $failFast): void

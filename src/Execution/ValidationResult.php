@@ -10,11 +10,21 @@ final class ValidationResult
 {
     private ErrorCollector $errors;
     private ?MessageResolver $messageResolver;
+    private array $data;
 
-    public function __construct(ErrorCollector $errors, ?MessageResolver $messageResolver = null)
+    public function __construct(ErrorCollector $errors, array $data = [], ?MessageResolver $messageResolver = null)
     {
         $this->errors = $errors;
+        $this->data = $data;
         $this->messageResolver = $messageResolver;
+    }
+
+    /**
+     * Get the validated data.
+     */
+    public function data(): array
+    {
+        return $this->data;
     }
 
     public function isValid(): bool
