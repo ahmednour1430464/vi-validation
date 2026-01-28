@@ -290,19 +290,25 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      *
      * Usage:
      * ```php
-     * foreach ($wrapper->stream($rows) as $index => $result) {
+     * // Stream through wrapper's data
+     * foreach ($wrapper->stream() as $index => $result) {
      *     if (!$result->isValid()) {
      *         // Handle error
      *     }
      * }
+     *
+     * // Or stream through custom rows
+     * foreach ($wrapper->stream($rows) as $index => $result) {
+     *     // ...
+     * }
      * ```
      *
-     * @param iterable<array<string, mixed>> $rows
+     * @param iterable<array<string, mixed>>|null $rows Rows to validate, or null to use wrapper's data
      * @return Generator<int, ValidationResult>
      */
-    public function stream(iterable $rows): Generator
+    public function stream(?iterable $rows = null): Generator
     {
-        return $this->validator->stream($rows);
+        return $this->validator->stream($rows ?? $this->data);
     }
 
     /**
@@ -313,19 +319,29 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      *
      * Usage:
      * ```php
-     * $wrapper->each($rows, function (ValidationResult $result, int $index) {
+     * // Process wrapper's data
+     * $wrapper->each(function (ValidationResult $result, int $index) {
      *     if (!$result->isValid()) {
      *         Log::error("Row $index failed", $result->errors());
      *     }
      * });
+     *
+     * // Or process custom rows
+     * $wrapper->each($rows, function (ValidationResult $result, int $index) {
+     *     // ...
+     * });
      * ```
      *
-     * @param iterable<array<string, mixed>> $rows
-     * @param callable(ValidationResult $result, int $index): void $callback
+     * @param iterable<array<string, mixed>>|callable $rowsOrCallback Rows to validate, or callback when using wrapper's data
+     * @param callable(ValidationResult $result, int $index): void|null $callback
      */
-    public function each(iterable $rows, callable $callback): void
+    public function each(iterable|callable $rowsOrCallback, ?callable $callback = null): void
     {
-        $this->validator->each($rows, $callback);
+        if (is_callable($rowsOrCallback)) {
+            $this->validator->each($this->data, $rowsOrCallback);
+        } else {
+            $this->validator->each($rowsOrCallback, $callback);
+        }
     }
 
     /**
@@ -334,12 +350,12 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      * Memory-efficient way to find all validation errors without storing
      * successful validations. Useful for batch import error reporting.
      *
-     * @param iterable<array<string, mixed>> $rows
+     * @param iterable<array<string, mixed>>|null $rows Rows to validate, or null to use wrapper's data
      * @return Generator<int, ValidationResult> Yields only failed validation results with their original index
      */
-    public function failures(iterable $rows): Generator
+    public function failures(?iterable $rows = null): Generator
     {
-        return $this->validator->failures($rows);
+        return $this->validator->failures($rows ?? $this->data);
     }
 
     /**
@@ -347,12 +363,12 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      *
      * Useful for fail-fast validation where you want to abort on first error.
      *
-     * @param iterable<array<string, mixed>> $rows
+     * @param iterable<array<string, mixed>>|null $rows Rows to validate, or null to use wrapper's data
      * @return ValidationResult|null The first failed result, or null if all pass
      */
-    public function firstFailure(iterable $rows): ?ValidationResult
+    public function firstFailure(?iterable $rows = null): ?ValidationResult
     {
-        return $this->validator->firstFailure($rows);
+        return $this->validator->firstFailure($rows ?? $this->data);
     }
 
     /**
@@ -360,11 +376,11 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      *
      * Memory-efficient way to validate entire dataset. Stops at first failure.
      *
-     * @param iterable<array<string, mixed>> $rows
+     * @param iterable<array<string, mixed>>|null $rows Rows to validate, or null to use wrapper's data
      */
-    public function allValid(iterable $rows): bool
+    public function allValid(?iterable $rows = null): bool
     {
-        return $this->validator->allValid($rows);
+        return $this->validator->allValid($rows ?? $this->data);
     }
 
     /**
@@ -373,11 +389,11 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      * WARNING: This method materializes all results in memory. For large datasets
      * (10,000+ rows), use stream() or each() instead to avoid memory exhaustion.
      *
-     * @param iterable<array<string, mixed>> $rows
+     * @param iterable<array<string, mixed>>|null $rows Rows to validate, or null to use wrapper's data
      * @return list<ValidationResult>
      */
-    public function validateMany(iterable $rows): array
+    public function validateMany(?iterable $rows = null): array
     {
-        return $this->validator->validateMany($rows);
+        return $this->validator->validateMany($rows ?? $this->data);
     }
 }
