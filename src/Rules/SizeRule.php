@@ -22,10 +22,18 @@ final class SizeRule implements RuleInterface
         }
 
         $actualSize = $this->getSize($value);
+        
+        // Determine type
+        $type = 'numeric';
+        if (is_array($value)) {
+            $type = 'array';
+        } elseif (is_string($value)) {
+            $type = 'string';
+        }
 
         // Use loose comparison to handle int/float differences
         if ((float) $actualSize != (float) $this->size) {
-            return ['rule' => 'size'];
+            return ['rule' => 'size', 'type' => $type, 'size' => $this->size];
         }
 
         return null;

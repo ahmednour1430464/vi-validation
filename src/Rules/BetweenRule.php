@@ -24,9 +24,17 @@ final class BetweenRule implements RuleInterface
         }
 
         $size = $this->getSize($value);
+        
+        // Determine type
+        $type = 'numeric';
+        if (is_array($value)) {
+            $type = 'array';
+        } elseif (is_string($value)) {
+            $type = 'string';
+        }
 
         if ($size < $this->min || $size > $this->max) {
-            return ['rule' => 'between'];
+            return ['rule' => 'between', 'type' => $type, 'min' => $this->min, 'max' => $this->max];
         }
 
         return null;
