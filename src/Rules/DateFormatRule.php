@@ -7,6 +7,7 @@ namespace Vi\Validation\Rules;
 use DateTimeImmutable;
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('date_format')]
 final class DateFormatRule implements RuleInterface
 {
     public function __construct(private string $format)
@@ -27,7 +28,7 @@ final class DateFormatRule implements RuleInterface
         $date = DateTimeImmutable::createFromFormat($this->format, $value);
 
         if ($date === false || $date->format($this->format) !== $value) {
-            return ['rule' => 'date_format', 'parameters' => ['format' => $this->format]];
+            return ['rule' => 'date_format', 'parameters' => [0 => $this->format, 'format' => $this->format]];
         }
 
         return null;

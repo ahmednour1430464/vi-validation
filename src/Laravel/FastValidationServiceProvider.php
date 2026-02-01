@@ -7,12 +7,23 @@ namespace Vi\Validation\Laravel;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 use Illuminate\Support\ServiceProvider;
 
+use Vi\Validation\Rules\RuleRegistry;
+
 final class FastValidationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(RuleRegistry::class, function () {
+            $registry = new RuleRegistry();
+            $registry->registerBuiltInRules();
+            return $registry;
+        });
+
         $this->app->singleton(FastValidatorFactory::class, function ($app) {
-            return new FastValidatorFactory(config('fast-validation'));
+            return new FastValidatorFactory(
+                config('fast-validation'),
+                $app->make(RuleRegistry::class)
+            );
         });
 
         $this->app->alias(FastValidatorFactory::class, 'fast.validator');

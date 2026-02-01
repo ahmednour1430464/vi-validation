@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('not_in')]
 final class NotInRule implements RuleInterface
 {
     /** @var list<string> */

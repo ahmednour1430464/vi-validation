@@ -108,7 +108,7 @@ final class ValidatorEngine
             
             // Resolve message if MessageResolver is available and no custom message was provided
             if ($message === null && $this->messageResolver !== null) {
-                $params = $error['params'] ?? [];
+                $params = $error['parameters'] ?? $error['params'] ?? [];
                 $message = $this->messageResolver->resolve($field, $error['rule'], $params);
             }
 

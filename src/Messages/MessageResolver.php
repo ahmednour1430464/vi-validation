@@ -104,6 +104,7 @@ final class MessageResolver
         $replacements = array_merge($params, ['attribute' => $attribute]);
 
         foreach ($replacements as $key => $value) {
+            $key = (string) $key;
             if (is_scalar($value)) {
                 $message = str_replace(
                     [':' . $key, ':' . strtoupper($key), ':' . ucfirst($key)],

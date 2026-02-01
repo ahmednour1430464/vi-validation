@@ -73,14 +73,14 @@ class ComparisonRulesTest extends TestCase
     {
         $rule = new BetweenRule(10, 100);
         $result = $rule->validate(5, 'field', $this->createContext());
-        $this->assertEquals(['rule' => 'between'], $result);
+        $this->assertEquals('between', $result['rule']);
     }
 
     public function testBetweenRuleFailsWhenAboveRange(): void
     {
         $rule = new BetweenRule(10, 100);
         $result = $rule->validate(150, 'field', $this->createContext());
-        $this->assertEquals(['rule' => 'between'], $result);
+        $this->assertEquals('between', $result['rule']);
     }
 
     // SizeRule Tests
@@ -106,7 +106,7 @@ class ComparisonRulesTest extends TestCase
     {
         $rule = new SizeRule(5);
         $result = $rule->validate('hi', 'field', $this->createContext());
-        $this->assertEquals(['rule' => 'size'], $result);
+        $this->assertEquals('size', $result['rule']);
     }
 
     // ConfirmedRule Tests

@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('required_array_keys')]
 final class RequiredArrayKeysRule implements RuleInterface
 {
     /** @var string[] */
@@ -19,12 +20,12 @@ final class RequiredArrayKeysRule implements RuleInterface
     public function validate(mixed $value, string $field, ValidationContext $context): ?array
     {
         if (!is_array($value)) {
-            return ['rule' => 'required_array_keys', 'parameters' => ['values' => implode(', ', $this->keys)]];
+            return ['rule' => 'required_array_keys', 'parameters' => array_values($this->keys)];
         }
 
         foreach ($this->keys as $key) {
             if (!array_key_exists($key, $value)) {
-                return ['rule' => 'required_array_keys', 'parameters' => ['values' => implode(', ', $this->keys)]];
+                return ['rule' => 'required_array_keys', 'parameters' => array_values($this->keys)];
             }
         }
 

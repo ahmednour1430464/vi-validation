@@ -7,6 +7,7 @@ namespace Vi\Validation\Rules;
 use SplFileInfo;
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('image')]
 final class ImageRule implements RuleInterface
 {
     /** @var list<string> */

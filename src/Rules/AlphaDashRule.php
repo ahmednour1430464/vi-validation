@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('alpha_dash')]
 final class AlphaDashRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

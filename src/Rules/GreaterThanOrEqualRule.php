@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('gte')]
 final class GreaterThanOrEqualRule implements RuleInterface
 {
     private string $otherField;

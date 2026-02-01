@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('date_equals')]
 final class DateEqualsRule implements RuleInterface
 {
     public function __construct(private string $date)
@@ -26,7 +27,7 @@ final class DateEqualsRule implements RuleInterface
         $compareToTimestamp = strtotime($this->date);
 
         if ($timestamp === false || $compareToTimestamp === false || $timestamp !== $compareToTimestamp) {
-            return ['rule' => 'date_equals', 'parameters' => ['date' => $this->date]];
+            return ['rule' => 'date_equals', 'parameters' => [0 => $this->date, 'date' => $this->date]];
         }
 
         return null;

@@ -9,6 +9,7 @@ use Vi\Validation\Execution\ValidationContext;
 /**
  * The field under validation must be empty or not present.
  */
+#[RuleName('prohibited')]
 final class ProhibitedRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

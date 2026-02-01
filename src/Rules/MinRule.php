@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('min')]
 final class MinRule implements RuleInterface
 {
     private int|float $min;

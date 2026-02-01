@@ -7,6 +7,7 @@ namespace Vi\Validation\Rules;
 use DateTimeImmutable;
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('after')]
 final class AfterRule implements RuleInterface
 {
     private string $dateOrField;

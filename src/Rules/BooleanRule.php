@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('boolean', aliases: ['bool'])]
 final class BooleanRule implements RuleInterface
 {
     private const ACCEPTABLE = [true, false, 0, 1, '0', '1'];

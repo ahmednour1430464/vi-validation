@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('multiple_of')]
 final class MultipleOfRule implements RuleInterface
 {
     public function __construct(private int|float $factor)
@@ -30,7 +31,7 @@ final class MultipleOfRule implements RuleInterface
         }
 
         if (fmod($value, $factor) !== 0.0) {
-            return ['rule' => 'multiple_of', 'parameters' => ['value' => $this->factor]];
+            return ['rule' => 'multiple_of', 'parameters' => [0 => $this->factor, 'value' => $this->factor]];
         }
 
         return null;

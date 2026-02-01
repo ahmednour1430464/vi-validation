@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('ip', aliases: ['ipv4', 'ipv6'])]
 final class IpRule implements RuleInterface
 {
     private ?string $version;

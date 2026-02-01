@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('declined')]
 final class DeclinedRule implements RuleInterface
 {
     private const DECLINED = ['no', 'off', '0', 0, false, 'false'];

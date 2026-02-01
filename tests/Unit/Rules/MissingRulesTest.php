@@ -78,21 +78,21 @@ class MissingRulesTest extends TestCase
     {
         $rule = new DateFormatRule('Y-m-d');
         $this->assertNull($rule->validate('2023-10-01', 'field', $this->createContext()));
-        $this->assertEquals(['rule' => 'date_format', 'parameters' => ['Y-m-d']], $rule->validate('01-10-2023', 'field', $this->createContext()));
+        $this->assertEquals(['rule' => 'date_format', 'parameters' => [0 => 'Y-m-d', 'format' => 'Y-m-d']], $rule->validate('01-10-2023', 'field', $this->createContext()));
     }
 
     public function testDateEqualsRule(): void
     {
         $rule = new DateEqualsRule('2023-10-01');
         $this->assertNull($rule->validate('2023-10-01', 'field', $this->createContext()));
-        $this->assertEquals(['rule' => 'date_equals', 'parameters' => ['2023-10-01']], $rule->validate('2023-10-02', 'field', $this->createContext()));
+        $this->assertEquals(['rule' => 'date_equals', 'parameters' => [0 => '2023-10-01', 'date' => '2023-10-01']], $rule->validate('2023-10-02', 'field', $this->createContext()));
     }
 
     public function testMultipleOfRule(): void
     {
         $rule = new MultipleOfRule(5);
         $this->assertNull($rule->validate(10, 'field', $this->createContext()));
-        $this->assertEquals(['rule' => 'multiple_of', 'parameters' => [5]], $rule->validate(12, 'field', $this->createContext()));
+        $this->assertEquals(['rule' => 'multiple_of', 'parameters' => [0 => 5, 'value' => 5]], $rule->validate(12, 'field', $this->createContext()));
     }
 
     public function testNotRegexRule(): void
@@ -106,14 +106,14 @@ class MissingRulesTest extends TestCase
     {
         $rule = new DoesntStartWithRule('foo');
         $this->assertNull($rule->validate('bar', 'field', $this->createContext()));
-        $this->assertEquals(['rule' => 'doesnt_start_with', 'parameters' => ['foo']], $rule->validate('foobar', 'field', $this->createContext()));
+        $this->assertEquals(['rule' => 'doesnt_start_with', 'parameters' => [0 => 'foo', 'values' => 'foo']], $rule->validate('foobar', 'field', $this->createContext()));
     }
 
     public function testDoesntEndWithRule(): void
     {
         $rule = new DoesntEndWithRule('bar');
         $this->assertNull($rule->validate('foo', 'field', $this->createContext()));
-        $this->assertEquals(['rule' => 'doesnt_end_with', 'parameters' => ['bar']], $rule->validate('foobar', 'field', $this->createContext()));
+        $this->assertEquals(['rule' => 'doesnt_end_with', 'parameters' => [0 => 'bar', 'values' => 'bar']], $rule->validate('foobar', 'field', $this->createContext()));
     }
 
     public function testTimezoneRule(): void

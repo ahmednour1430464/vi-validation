@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('not_regex')]
 final class NotRegexRule implements RuleInterface
 {
     public function __construct(private string $pattern)

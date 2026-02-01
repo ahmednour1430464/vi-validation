@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('prohibited_unless')]
 final class ProhibitedUnlessRule implements RuleInterface
 {
     private string $otherField;
@@ -32,10 +33,7 @@ final class ProhibitedUnlessRule implements RuleInterface
                     'rule' => 'prohibited_unless',
                     'parameters' => [
                         'other' => $this->otherField,
-                        'value' => implode(', ', $this->values), // Translator uses :values but here we used :value. Checking Translator again... 'value' => ... 
-                        // Translator has 'prohibited_unless' => '... unless :other is in :values.'
-                        // So key must be 'values'.
-                        'values' => implode(', ', $this->values),
+                        'value' => implode(', ', $this->values),
                     ],
                 ];
             }

@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('digits_between')]
 final class DigitsBetweenRule implements RuleInterface
 {
     private int $min;

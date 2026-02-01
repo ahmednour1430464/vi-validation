@@ -46,16 +46,17 @@ class IntegrationTest extends TestCase
         $this->assertArrayHasKey('score', $errors);
         $this->assertArrayHasKey('comment', $errors);
 
+        $messages = $result->messages();
+
         // Check error messages (English default)
-        var_dump($errors); 
-        $this->assertEquals(['The url is not a valid URL.'], $errors['url']);
-        $this->assertEquals(['The username must only contain letters, numbers, dashes and underscores.'], $errors['username']);
-        $this->assertEquals(['The mac must be a valid MAC address.'], $errors['mac']);
-        $this->assertEquals(['The uuid must be a valid ULID.'], $errors['uuid']);
-        $this->assertEquals(['The code must be uppercase.'], $errors['code']);
-        $this->assertEquals(['The event_date does not match the format Y-m-d.'], $errors['event_date']);
-        $this->assertEquals(['The score must be a multiple of 5.'], $errors['score']);
-        $this->assertEquals(['The comment format is invalid.'], $errors['comment']);
+        $this->assertEquals(['The url is not a valid URL.'], $messages['url']);
+        $this->assertEquals(['The username must only contain letters, numbers, dashes and underscores.'], $messages['username']);
+        $this->assertEquals(['The mac must be a valid MAC address.'], $messages['mac']);
+        $this->assertEquals(['The uuid must be a valid ULID.'], $messages['uuid']);
+        $this->assertEquals(['The code must be uppercase.'], $messages['code']);
+        $this->assertEquals(['The event date does not match the format Y-m-d.'], $messages['event_date']);
+        $this->assertEquals(['The score must be a multiple of 5.'], $messages['score']);
+        $this->assertEquals(['The comment format is invalid.'], $messages['comment']);
     }
 
     public function testProhibitedRulesIntegration(): void
@@ -71,7 +72,7 @@ class IntegrationTest extends TestCase
         ]);
 
         $this->assertFalse($result->isValid());
-        $this->assertEquals(['The secret field is prohibited when public is 1.'], $result->errors()['secret']);
+        $this->assertEquals(['The secret field is prohibited when public is 1.'], $result->messages()['secret']);
 
         // Should pass
         $result = $schema->validate([

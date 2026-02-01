@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('regex')]
 final class RegexRule implements RuleInterface
 {
     private string $pattern;

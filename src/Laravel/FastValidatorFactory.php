@@ -14,6 +14,8 @@ use Vi\Validation\Messages\Translator;
 use Vi\Validation\Schema\SchemaBuilder;
 use Vi\Validation\SchemaValidator;
 
+use Vi\Validation\Rules\RuleRegistry;
+
 final class FastValidatorFactory
 {
     /** @var array<string, mixed> */
@@ -23,9 +25,17 @@ final class FastValidatorFactory
 
     private ?ValidatorEngine $engine = null;
 
-    public function __construct(array $config = [])
+    private RuleRegistry $registry;
+
+    public function __construct(array $config = [], ?RuleRegistry $registry = null)
     {
         $this->config = $config;
+        $this->registry = $registry ?? new RuleRegistry();
+        
+        if ($registry === null) {
+            $this->registry->registerBuiltInRules();
+        }
+
         $this->initializeCache();
         $this->initializeEngine();
     }
@@ -78,7 +88,7 @@ final class FastValidatorFactory
         }
 
         // Build schema
-        $parser = new LaravelRuleParser();
+        $parser = new LaravelRuleParser($this->registry);
         $builder = new SchemaBuilder();
 
         foreach ($rules as $field => $definition) {

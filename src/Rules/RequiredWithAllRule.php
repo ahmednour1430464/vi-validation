@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('required_with_all')]
 final class RequiredWithAllRule implements RuleInterface
 {
     /** @var list<string> */

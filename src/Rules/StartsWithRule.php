@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('starts_with')]
 final class StartsWithRule implements RuleInterface
 {
     /** @var list<string> */

@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('max')]
 final class MaxRule implements RuleInterface
 {
     private int|float $max;

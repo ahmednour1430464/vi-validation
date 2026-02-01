@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('required_without')]
 final class RequiredWithoutRule implements RuleInterface
 {
     /** @var list<string> */

@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('lte')]
 final class LessThanOrEqualRule implements RuleInterface
 {
     private string $otherField;

@@ -7,6 +7,7 @@ namespace Vi\Validation\Rules;
 use DateTimeImmutable;
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('before_or_equal')]
 final class BeforeOrEqualRule implements RuleInterface
 {
     private string $dateOrField;

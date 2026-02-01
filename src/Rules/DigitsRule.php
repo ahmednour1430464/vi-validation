@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('digits')]
 final class DigitsRule implements RuleInterface
 {
     private int $length;

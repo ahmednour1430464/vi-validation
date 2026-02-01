@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('confirmed')]
 final class ConfirmedRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

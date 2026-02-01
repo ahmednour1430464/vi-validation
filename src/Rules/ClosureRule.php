@@ -17,6 +17,7 @@ use Vi\Validation\Execution\ValidationContext;
  *     }
  * }
  */
+#[RuleName('closure')]
 final class ClosureRule implements RuleInterface
 {
     private Closure $callback;

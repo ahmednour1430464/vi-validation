@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('in')]
 final class InRule implements RuleInterface
 {
     /** @var list<string> */

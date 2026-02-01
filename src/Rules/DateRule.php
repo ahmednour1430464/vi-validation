@@ -7,6 +7,7 @@ namespace Vi\Validation\Rules;
 use DateTimeImmutable;
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('date')]
 final class DateRule implements RuleInterface
 {
     private ?string $format;

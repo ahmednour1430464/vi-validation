@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('between')]
 final class BetweenRule implements RuleInterface
 {
     private int|float $min;

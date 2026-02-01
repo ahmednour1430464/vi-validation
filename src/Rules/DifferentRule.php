@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
+#[RuleName('different')]
 final class DifferentRule implements RuleInterface
 {
     private string $otherField;
