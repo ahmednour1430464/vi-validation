@@ -19,12 +19,12 @@ final class RequiredArrayKeysRule implements RuleInterface
     public function validate(mixed $value, string $field, ValidationContext $context): ?array
     {
         if (!is_array($value)) {
-            return ['rule' => 'required_array_keys', 'parameters' => $this->keys];
+            return ['rule' => 'required_array_keys', 'parameters' => ['values' => implode(', ', $this->keys)]];
         }
 
         foreach ($this->keys as $key) {
             if (!array_key_exists($key, $value)) {
-                return ['rule' => 'required_array_keys', 'parameters' => $this->keys];
+                return ['rule' => 'required_array_keys', 'parameters' => ['values' => implode(', ', $this->keys)]];
             }
         }
 

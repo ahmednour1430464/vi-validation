@@ -239,6 +239,24 @@ final class Translator implements TranslatorInterface
             'present' => 'The :attribute field must be present.',
             'prohibited' => 'The :attribute field is prohibited.',
             'distinct' => 'The :attribute field has a duplicate value.',
+
+            // New rules
+            'active_url' => 'The :attribute is not a valid URL.',
+            'alpha_dash' => 'The :attribute must only contain letters, numbers, dashes and underscores.',
+            'mac_address' => 'The :attribute must be a valid MAC address.',
+            'ulid' => 'The :attribute must be a valid ULID.',
+            'uppercase' => 'The :attribute must be uppercase.',
+            'lowercase' => 'The :attribute must be lowercase.',
+            'date_format' => 'The :attribute does not match the format :format.',
+            'date_equals' => 'The :attribute must be a date equal to :date.',
+            'multiple_of' => 'The :attribute must be a multiple of :value.',
+            'not_regex' => 'The :attribute format is invalid.',
+            'doesnt_start_with' => 'The :attribute may not start with one of the following: :values.',
+            'doesnt_end_with' => 'The :attribute may not end with one of the following: :values.',
+            'timezone' => 'The :attribute must be a valid zone.',
+            'required_array_keys' => 'The :attribute field must contain entries for: :values.',
+            'prohibited_if' => 'The :attribute field is prohibited when :other is :value.',
+            'prohibited_unless' => 'The :attribute field is prohibited unless :other is in :values.',
         ];
     }
 }

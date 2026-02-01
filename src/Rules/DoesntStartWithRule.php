@@ -28,7 +28,7 @@ final class DoesntStartWithRule implements RuleInterface
 
         foreach ($this->needles as $needle) {
             if ($needle !== '' && str_starts_with($value, $needle)) {
-                return ['rule' => 'doesnt_start_with', 'parameters' => $this->needles];
+                return ['rule' => 'doesnt_start_with', 'parameters' => ['values' => implode(', ', $this->needles)]];
             }
         }
 

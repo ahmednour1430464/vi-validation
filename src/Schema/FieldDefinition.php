@@ -206,6 +206,105 @@ final class FieldDefinition
         return $this;
     }
 
+    // Phase 1: String & Format
+    public function activeUrl(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ActiveUrlRule();
+        return $this;
+    }
+
+    public function alphaDash(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\AlphaDashRule();
+        return $this;
+    }
+
+    public function macAddress(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MacAddressRule();
+        return $this;
+    }
+
+    public function ulid(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\UlidRule();
+        return $this;
+    }
+
+    public function uppercase(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\UppercaseRule();
+        return $this;
+    }
+
+    public function lowercase(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\LowercaseRule();
+        return $this;
+    }
+
+    // Phase 2: Date & Numeric
+    public function dateFormat(string $format): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DateFormatRule($format);
+        return $this;
+    }
+
+    public function dateEquals(string $date): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DateEqualsRule($date);
+        return $this;
+    }
+
+    public function multipleOf(int|float $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MultipleOfRule($value);
+        return $this;
+    }
+
+    // Phase 3: Advanced Logic
+    public function notRegex(string $pattern): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\NotRegexRule($pattern);
+        return $this;
+    }
+
+    public function doesntStartWith(string ...$needles): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DoesntStartWithRule(...$needles);
+        return $this;
+    }
+
+    public function doesntEndWith(string ...$needles): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DoesntEndWithRule(...$needles);
+        return $this;
+    }
+
+    public function timezone(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\TimezoneRule();
+        return $this;
+    }
+
+    public function requiredArrayKeys(string ...$keys): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredArrayKeysRule(...$keys);
+        return $this;
+    }
+
+    public function prohibitedIf(string $otherField, array $values): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ProhibitedIfRule($otherField, $values);
+        return $this;
+    }
+
+    public function prohibitedUnless(string $otherField, array $values): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ProhibitedUnlessRule($otherField, $values);
+        return $this;
+    }
+
     public function getName(): string
     {
         return $this->name;

@@ -19,18 +19,18 @@ final class MultipleOfRule implements RuleInterface
         }
 
         if (!is_numeric($value)) {
-            return ['rule' => 'multiple_of', 'parameters' => [$this->factor]];
+            return ['rule' => 'multiple_of', 'parameters' => ['value' => $this->factor]];
         }
 
         $value = (float) $value;
         $factor = (float) $this->factor;
 
         if ($factor == 0) {
-            return ['rule' => 'multiple_of', 'parameters' => [$this->factor]];
+            return ['rule' => 'multiple_of', 'parameters' => ['value' => $this->factor]];
         }
 
         if (fmod($value, $factor) !== 0.0) {
-            return ['rule' => 'multiple_of', 'parameters' => [$this->factor]];
+            return ['rule' => 'multiple_of', 'parameters' => ['value' => $this->factor]];
         }
 
         return null;

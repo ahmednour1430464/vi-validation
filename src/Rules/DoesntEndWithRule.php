@@ -28,7 +28,7 @@ final class DoesntEndWithRule implements RuleInterface
 
         foreach ($this->needles as $needle) {
             if ($needle !== '' && str_ends_with($value, $needle)) {
-                return ['rule' => 'doesnt_end_with', 'parameters' => $this->needles];
+                return ['rule' => 'doesnt_end_with', 'parameters' => ['values' => implode(', ', $this->needles)]];
             }
         }
 

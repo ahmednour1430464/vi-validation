@@ -45,4 +45,22 @@ return [
     'image' => 'يجب أن يكون :attribute صورة.',
     'mimes' => 'يجب أن يكون :attribute ملفاً من نوع: :values.',
     'max_file_size' => 'يجب أن لا يكون حجم :attribute أكبر من :max كيلوبايت.',
+
+    // New rules
+    'active_url' => ':attribute ليس رابطاً صالحاً.',
+    'alpha_dash' => 'يجب أن يحتوي :attribute على أحرف وأرقام ومطرات وشرط سفلية فقط.',
+    'mac_address' => 'يجب أن يكون :attribute عنوان MAC صالح.',
+    'ulid' => 'يجب أن يكون :attribute ULID صالح.',
+    'uppercase' => 'يجب أن يكون :attribute حروفاً كبيرة.',
+    'lowercase' => 'يجب أن يكون :attribute حروفاً صغيرة.',
+    'date_format' => 'لا يتوافق :attribute مع الشكل :format.',
+    'date_equals' => 'يجب أن يكون :attribute تاريخاً مساوياً لـ :date.',
+    'multiple_of' => 'يجب أن يكون :attribute مضاعفاً لـ :value.',
+    'not_regex' => 'صيغة :attribute غير صحيحة.',
+    'doesnt_start_with' => 'يجب ألا يبدأ :attribute بأحد القيم التالية: :values.',
+    'doesnt_end_with' => 'يجب ألا ينتهي :attribute بأحد القيم التالية: :values.',
+    'timezone' => 'يجب أن يكون :attribute نطاقاً زمنياً صحيحاً.',
+    'required_array_keys' => 'يجب أن يحتوي :attribute على مدخلات لـ: :values.',
+    'prohibited_if' => 'حقل :attribute محظور عندما يكون :other هو :value.',
+    'prohibited_unless' => 'حقل :attribute محظور ما لم يكن :other في :values.',
 ];

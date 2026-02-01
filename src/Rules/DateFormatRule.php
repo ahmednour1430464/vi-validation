@@ -20,14 +20,14 @@ final class DateFormatRule implements RuleInterface
         }
 
         if (!is_string($value) && !is_numeric($value)) {
-            return ['rule' => 'date_format', 'parameters' => [$this->format]];
+            return ['rule' => 'date_format', 'parameters' => ['format' => $this->format]];
         }
 
         $value = (string) $value;
         $date = DateTimeImmutable::createFromFormat($this->format, $value);
 
         if ($date === false || $date->format($this->format) !== $value) {
-            return ['rule' => 'date_format', 'parameters' => [$this->format]];
+            return ['rule' => 'date_format', 'parameters' => ['format' => $this->format]];
         }
 
         return null;
