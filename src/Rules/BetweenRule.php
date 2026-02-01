@@ -34,7 +34,7 @@ final class BetweenRule implements RuleInterface
         }
 
         if ($size < $this->min || $size > $this->max) {
-            return ['rule' => 'between', 'type' => $type, 'min' => $this->min, 'max' => $this->max];
+            return ['rule' => 'between', 'params' => ['type' => $type, 'min' => $this->min, 'max' => $this->max]];
         }
 
         return null;

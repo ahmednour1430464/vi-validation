@@ -33,7 +33,7 @@ final class SizeRule implements RuleInterface
 
         // Use loose comparison to handle int/float differences
         if ((float) $actualSize != (float) $this->size) {
-            return ['rule' => 'size', 'type' => $type, 'size' => $this->size];
+            return ['rule' => 'size', 'params' => ['type' => $type, 'size' => $this->size]];
         }
 
         return null;
