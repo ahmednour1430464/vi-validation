@@ -21,11 +21,17 @@ final class MinRule implements RuleInterface
             return null;
         }
 
-        if (is_string($value) || is_array($value)) {
-            if (count((array) $value) < $this->min) {
+        if (is_array($value)) {
+            if (count($value) < $this->min) {
                 return ['rule' => 'min'];
             }
+            return null;
+        }
 
+        if (is_string($value)) {
+            if (mb_strlen($value) < $this->min) {
+                return ['rule' => 'min'];
+            }
             return null;
         }
 

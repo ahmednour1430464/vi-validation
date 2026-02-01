@@ -34,25 +34,21 @@ final class ValidatorEngine
                 break;
             }
 
-            $value = $context->getValue($field->getName());
+            $value = $field->getValue($data);
 
             $rules = $field->getRules();
-            $isNullable = $this->isNullable($rules);
+            $isNullable = $field->isNullable();
 
             if ($value === null && $isNullable) {
                 continue;
             }
 
             foreach ($rules as $rule) {
-                if ($this->shouldStopValidation($errors)) {
-                    break;
+                if ($this->applyRule($rule, $field->getName(), $value, $context)) {
+                    if ($this->shouldStopValidation($errors)) {
+                        break;
+                    }
                 }
-
-                if ($rule instanceof NullableRule) {
-                    continue;
-                }
-
-                $this->applyRule($rule, $field->getName(), $value, $context);
             }
         }
 
@@ -74,19 +70,7 @@ final class ValidatorEngine
         $this->messageResolver = $resolver;
     }
 
-    /**
-     * @param list<RuleInterface> $rules
-     */
-    private function isNullable(array $rules): bool
-    {
-        foreach ($rules as $rule) {
-            if ($rule instanceof NullableRule) {
-                return true;
-            }
-        }
 
-        return false;
-    }
 
     private function shouldStopValidation(ErrorCollector $errors): bool
     {
@@ -104,7 +88,7 @@ final class ValidatorEngine
     /**
      * @param RuleInterface $rule
      */
-    private function applyRule(RuleInterface $rule, string $field, mixed $value, ValidationContext $context): void
+    private function applyRule(RuleInterface $rule, string $field, mixed $value, ValidationContext $context): bool
     {
         $error = $rule->validate($value, $field, $context);
 
@@ -118,6 +102,9 @@ final class ValidatorEngine
             }
 
             $context->addError($field, $error['rule'], $message);
+            return true;
         }
+
+        return false;
     }
 }

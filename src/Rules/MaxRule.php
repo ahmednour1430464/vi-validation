@@ -21,11 +21,17 @@ final class MaxRule implements RuleInterface
             return null;
         }
 
-        if (is_string($value) || is_array($value)) {
-            if (count((array) $value) > $this->max) {
+        if (is_array($value)) {
+            if (count($value) > $this->max) {
                 return ['rule' => 'max'];
             }
+            return null;
+        }
 
+        if (is_string($value)) {
+            if (mb_strlen($value) > $this->max) {
+                return ['rule' => 'max'];
+            }
             return null;
         }
 
