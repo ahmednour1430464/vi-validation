@@ -44,6 +44,11 @@ final class ValidationContext
         return $this->data;
     }
 
+    public function setData(array $data): void
+    {
+        $this->data = $data;
+    }
+
     public function addError(string $field, string $rule, ?string $message = null): void
     {
         $this->errors->add($field, $rule, $message);

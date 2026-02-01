@@ -14,6 +14,9 @@ final class ValidatorEngine
     private bool $failFast;
     private int $maxErrors;
 
+    private ?ErrorCollector $errors = null;
+    private ?ValidationContext $context = null;
+
     public function __construct(
         ?MessageResolver $messageResolver = null,
         bool $failFast = false,
@@ -26,8 +29,16 @@ final class ValidatorEngine
 
     public function validate(CompiledSchema $schema, array $data): ValidationResult
     {
-        $errors = new ErrorCollector();
-        $context = new ValidationContext($data, $errors);
+        if ($this->errors === null) {
+            $this->errors = new ErrorCollector();
+            $this->context = new ValidationContext($data, $this->errors);
+        } else {
+            $this->errors->reset();
+            $this->context->setData($data);
+        }
+
+        $errors = $this->errors;
+        $context = $this->context;
 
         foreach ($schema->getFields() as $field) {
             if ($this->shouldStopValidation($errors)) {
@@ -52,7 +63,7 @@ final class ValidatorEngine
             }
         }
 
-        return new ValidationResult($errors, $data, $this->messageResolver);
+        return new ValidationResult($errors->all(), $data, $this->messageResolver);
     }
 
     public function setFailFast(bool $failFast): void

@@ -20,6 +20,12 @@ final class ErrorCollector
         $this->errorCount++;
     }
 
+    public function reset(): void
+    {
+        $this->errors = [];
+        $this->errorCount = 0;
+    }
+
     public function hasErrors(): bool
     {
         return $this->errors !== [];

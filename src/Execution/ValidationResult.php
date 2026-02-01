@@ -8,13 +8,21 @@ use Vi\Validation\Messages\MessageResolver;
 
 final class ValidationResult
 {
-    private ErrorCollector $errors;
+    /** @var array<string, list<array{rule: string, message: string|null}>> */
+    private array $errors;
     private ?MessageResolver $messageResolver;
     private array $data;
 
-    public function __construct(ErrorCollector $errors, array $data = [], ?MessageResolver $messageResolver = null)
+    /**
+     * @param ErrorCollector|array<string, list<array{rule: string, message: string|null}>> $errors
+     */
+    public function __construct($errors, array $data = [], ?MessageResolver $messageResolver = null)
     {
-        $this->errors = $errors;
+        if ($errors instanceof ErrorCollector) {
+            $this->errors = $errors->all();
+        } else {
+            $this->errors = $errors;
+        }
         $this->data = $data;
         $this->messageResolver = $messageResolver;
     }
@@ -29,7 +37,7 @@ final class ValidationResult
 
     public function isValid(): bool
     {
-        return !$this->errors->hasErrors();
+        return $this->errors === [];
     }
 
     /**
@@ -37,7 +45,7 @@ final class ValidationResult
      */
     public function errors(): array
     {
-        return $this->errors->all();
+        return $this->errors;
     }
 
     /**
@@ -48,7 +56,7 @@ final class ValidationResult
     public function messages(): array
     {
         $messages = [];
-        $rawErrors = $this->errors->all();
+        $rawErrors = $this->errors;
 
         foreach ($rawErrors as $field => $fieldErrors) {
             $messages[$field] = [];
