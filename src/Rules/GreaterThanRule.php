@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('gt')]
+#[RuleName(RuleId::GT)]
 final class GreaterThanRule implements RuleInterface
 {
     private string $otherField;

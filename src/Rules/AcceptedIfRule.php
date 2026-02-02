@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('accepted_if')]
+#[RuleName(RuleId::ACCEPTED_IF)]
 final class AcceptedIfRule implements RuleInterface
 {
     private const ACCEPTABLE = ['yes', 'on', '1', 1, true, 'true'];

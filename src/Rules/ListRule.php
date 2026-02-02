@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('list')]
+#[RuleName(RuleId::LIST)]
 final class ListRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

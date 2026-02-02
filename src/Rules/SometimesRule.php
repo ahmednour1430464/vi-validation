@@ -9,7 +9,7 @@ use Vi\Validation\Execution\ValidationContext;
 /**
  * Marker rule for 'sometimes' logic.
  */
-#[RuleName('sometimes')]
+#[RuleName(RuleId::SOMETIMES)]
 final class SometimesRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

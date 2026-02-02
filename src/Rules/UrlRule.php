@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('url')]
+#[RuleName(RuleId::URL)]
 final class UrlRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

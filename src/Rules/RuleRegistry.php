@@ -44,7 +44,7 @@ final class RuleRegistry
             $attribute = $attributes[0]->newInstance();
 
             self::$metadataCache[$class] = [
-                'name' => $attribute->name,
+                'name' => $attribute->name instanceof RuleId ? $attribute->name->value : $attribute->name,
                 'aliases' => $attribute->aliases,
             ];
         }

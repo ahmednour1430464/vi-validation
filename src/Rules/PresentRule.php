@@ -9,7 +9,7 @@ use Vi\Validation\Execution\ValidationContext;
 /**
  * The field under validation must be present in the input data (but can be empty).
  */
-#[RuleName('present')]
+#[RuleName(RuleId::PRESENT)]
 final class PresentRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

@@ -7,7 +7,7 @@ namespace Vi\Validation\Rules;
 use DateTimeZone;
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('timezone')]
+#[RuleName(RuleId::TIMEZONE)]
 final class TimezoneRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('extensions')]
+#[RuleName(RuleId::EXTENSIONS)]
 final class ExtensionsRule implements RuleInterface
 {
     /** @var list<string> */

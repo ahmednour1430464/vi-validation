@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('ascii')]
+#[RuleName(RuleId::ASCII)]
 final class AsciiRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('min_file_size')]
+#[RuleName(RuleId::MIN_FILE_SIZE)]
 final class MinFileSizeRule implements RuleInterface
 {
     private int $min;

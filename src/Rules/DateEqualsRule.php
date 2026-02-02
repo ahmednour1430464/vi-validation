@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('date_equals')]
+#[RuleName(RuleId::DATE_EQUALS)]
 final class DateEqualsRule implements RuleInterface
 {
     public function __construct(private string $date)

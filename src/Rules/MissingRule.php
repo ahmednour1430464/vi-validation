@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('missing')]
+#[RuleName(RuleId::MISSING)]
 final class MissingRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

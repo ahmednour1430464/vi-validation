@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('unique')]
+#[RuleName(RuleId::UNIQUE)]
 final class UniqueRule implements RuleInterface
 {
     private string $table;

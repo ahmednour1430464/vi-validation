@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('email')]
+#[RuleName(RuleId::EMAIL)]
 final class EmailRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

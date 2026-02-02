@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('current_password')]
+#[RuleName(RuleId::CURRENT_PASSWORD)]
 final class CurrentPasswordRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

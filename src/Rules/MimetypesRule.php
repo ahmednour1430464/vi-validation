@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('mimetypes')]
+#[RuleName(RuleId::MIMETYPES)]
 final class MimetypesRule implements RuleInterface
 {
     /** @var list<string> */

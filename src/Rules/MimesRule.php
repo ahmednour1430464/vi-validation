@@ -7,7 +7,7 @@ namespace Vi\Validation\Rules;
 use SplFileInfo;
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('mimes')]
+#[RuleName(RuleId::MIMES)]
 final class MimesRule implements RuleInterface
 {
     /** @var list<string> */

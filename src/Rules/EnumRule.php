@@ -7,7 +7,7 @@ namespace Vi\Validation\Rules;
 use Vi\Validation\Execution\ValidationContext;
 use UnitEnum;
 
-#[RuleName('enum')]
+#[RuleName(RuleId::ENUM)]
 final class EnumRule implements RuleInterface
 {
     /** @var class-string<UnitEnum> */

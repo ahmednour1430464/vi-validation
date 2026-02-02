@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('prohibited_if')]
+#[RuleName(RuleId::PROHIBITED_IF)]
 final class ProhibitedIfRule implements RuleInterface
 {
     private string $otherField;

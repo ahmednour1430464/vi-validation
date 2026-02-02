@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('required')]
+#[RuleName(RuleId::REQUIRED)]
 final class RequiredRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

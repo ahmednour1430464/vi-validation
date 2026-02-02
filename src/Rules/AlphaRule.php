@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('alpha')]
+#[RuleName(RuleId::ALPHA)]
 final class AlphaRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('required_unless')]
+#[RuleName(RuleId::REQUIRED_UNLESS)]
 final class RequiredUnlessRule implements RuleInterface
 {
     private string $otherField;

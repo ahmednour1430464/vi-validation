@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('exists')]
+#[RuleName(RuleId::EXISTS)]
 final class ExistsRule implements RuleInterface
 {
     private string $table;

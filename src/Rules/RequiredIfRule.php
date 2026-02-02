@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('required_if')]
+#[RuleName(RuleId::REQUIRED_IF)]
 final class RequiredIfRule implements RuleInterface
 {
     private string $otherField;

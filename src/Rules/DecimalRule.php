@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('decimal')]
+#[RuleName(RuleId::DECIMAL)]
 final class DecimalRule implements RuleInterface
 {
     private int $min;

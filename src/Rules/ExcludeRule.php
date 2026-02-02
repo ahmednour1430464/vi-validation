@@ -9,7 +9,7 @@ use Vi\Validation\Execution\ValidationContext;
 /**
  * Marker rule for 'exclude' logic.
  */
-#[RuleName('exclude')]
+#[RuleName(RuleId::EXCLUDE)]
 final class ExcludeRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

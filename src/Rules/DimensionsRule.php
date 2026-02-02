@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('dimensions')]
+#[RuleName(RuleId::DIMENSIONS)]
 final class DimensionsRule implements RuleInterface
 {
     /** @var array<string, int> */

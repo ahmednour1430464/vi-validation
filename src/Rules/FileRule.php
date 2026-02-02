@@ -7,7 +7,7 @@ namespace Vi\Validation\Rules;
 use SplFileInfo;
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('file')]
+#[RuleName(RuleId::FILE)]
 final class FileRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

@@ -9,7 +9,7 @@ use Vi\Validation\Execution\ValidationContext;
 /**
  * When validating arrays, the field must not have any duplicate values.
  */
-#[RuleName('distinct')]
+#[RuleName(RuleId::DISTINCT)]
 final class DistinctRule implements RuleInterface
 {
     private bool $strict;

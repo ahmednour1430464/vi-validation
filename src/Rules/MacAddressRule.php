@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('mac_address')]
+#[RuleName(RuleId::MAC_ADDRESS)]
 final class MacAddressRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

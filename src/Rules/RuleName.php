@@ -10,7 +10,7 @@ use Attribute;
 final class RuleName
 {
     public function __construct(
-        public readonly string $name,
+        public readonly string|RuleId $name,
         public readonly array $aliases = []
     ) {
     }

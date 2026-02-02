@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('doesnt_start_with')]
+#[RuleName(RuleId::DOESNT_START_WITH)]
 final class DoesntStartWithRule implements RuleInterface
 {
     /** @var string[] */

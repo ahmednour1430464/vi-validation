@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('country')]
+#[RuleName(RuleId::COUNTRY)]
 final class CountryRule implements RuleInterface
 {
     private const COUNTRIES = [

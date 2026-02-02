@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('password')]
+#[RuleName(RuleId::PASSWORD)]
 final class PasswordRule implements RuleInterface
 {
     private int $min = 8;

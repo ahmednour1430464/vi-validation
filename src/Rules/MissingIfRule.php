@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('missing_if')]
+#[RuleName(RuleId::MISSING_IF)]
 final class MissingIfRule implements RuleInterface
 {
     private string $otherField;

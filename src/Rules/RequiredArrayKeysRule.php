@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('required_array_keys')]
+#[RuleName(RuleId::REQUIRED_ARRAY_KEYS)]
 final class RequiredArrayKeysRule implements RuleInterface
 {
     /** @var string[] */

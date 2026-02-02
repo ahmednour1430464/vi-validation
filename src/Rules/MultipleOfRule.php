@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('multiple_of')]
+#[RuleName(RuleId::MULTIPLE_OF)]
 final class MultipleOfRule implements RuleInterface
 {
     public function __construct(private int|float $factor)

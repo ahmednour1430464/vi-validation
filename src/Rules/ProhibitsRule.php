@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('prohibits')]
+#[RuleName(RuleId::PROHIBITS)]
 final class ProhibitsRule implements RuleInterface
 {
     /** @var list<string> */

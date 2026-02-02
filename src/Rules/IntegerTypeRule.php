@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('integer', aliases: ['int'])]
+#[RuleName(RuleId::INTEGER, aliases: ['int'])]
 final class IntegerTypeRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

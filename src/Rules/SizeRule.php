@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('size')]
+#[RuleName(RuleId::SIZE)]
 final class SizeRule implements RuleInterface
 {
     private int|float $size;

@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('language')]
+#[RuleName(RuleId::LANGUAGE)]
 final class LanguageRule implements RuleInterface
 {
     private const LANGUAGES = [

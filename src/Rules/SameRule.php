@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('same')]
+#[RuleName(RuleId::SAME)]
 final class SameRule implements RuleInterface
 {
     private string $otherField;

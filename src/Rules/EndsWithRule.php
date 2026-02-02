@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('ends_with')]
+#[RuleName(RuleId::ENDS_WITH)]
 final class EndsWithRule implements RuleInterface
 {
     /** @var list<string> */

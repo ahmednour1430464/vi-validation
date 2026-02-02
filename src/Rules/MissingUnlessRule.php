@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('missing_unless')]
+#[RuleName(RuleId::MISSING_UNLESS)]
 final class MissingUnlessRule implements RuleInterface
 {
     private string $otherField;

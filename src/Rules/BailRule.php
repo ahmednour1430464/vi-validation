@@ -9,7 +9,7 @@ use Vi\Validation\Execution\ValidationContext;
 /**
  * Marker rule for 'bail' logic.
  */
-#[RuleName('bail')]
+#[RuleName(RuleId::BAIL)]
 final class BailRule implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

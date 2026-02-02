@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('missing_with_all')]
+#[RuleName(RuleId::MISSING_WITH_ALL)]
 final class MissingWithAllRule implements RuleInterface
 {
     /** @var list<string> */

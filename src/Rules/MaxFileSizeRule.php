@@ -7,7 +7,7 @@ namespace Vi\Validation\Rules;
 use SplFileInfo;
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('max_file_size')]
+#[RuleName(RuleId::MAX_FILE_SIZE)]
 final class MaxFileSizeRule implements RuleInterface
 {
     private int $maxKilobytes;

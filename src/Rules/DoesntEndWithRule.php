@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('doesnt_end_with')]
+#[RuleName(RuleId::DOESNT_END_WITH)]
 final class DoesntEndWithRule implements RuleInterface
 {
     /** @var string[] */

@@ -6,7 +6,7 @@ namespace Vi\Validation\Rules;
 
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('exclude_with')]
+#[RuleName(RuleId::EXCLUDE_WITH)]
 final class ExcludeWithRule implements RuleInterface
 {
     private string $otherField;

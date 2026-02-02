@@ -7,7 +7,7 @@ namespace Vi\Validation\Rules;
 use DateTimeImmutable;
 use Vi\Validation\Execution\ValidationContext;
 
-#[RuleName('before')]
+#[RuleName(RuleId::BEFORE)]
 final class BeforeRule implements RuleInterface
 {
     private string $dateOrField;
