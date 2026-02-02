@@ -9,7 +9,9 @@ use Vi\Validation\Rules\RuleRegistry;
 use Vi\Validation\Rules\RuleInterface;
 use Vi\Validation\Rules\RuleName;
 use Vi\Validation\Execution\ValidationContext;
+use Vi\Validation\Rules\RuleId;
 use LogicException;
+use InvalidArgumentException;
 
 final class RuleRegistryTest extends TestCase
 {
@@ -58,6 +60,47 @@ final class RuleRegistryTest extends TestCase
         $this->assertEquals(MockRuleA::class, $this->registry->get('alias_a'));
         $this->assertEquals(MockRuleA::class, $this->registry->get('alias_b'));
     }
+
+    public function testAllReturnsRegisteredRules(): void
+    {
+        $this->registry->register(MockRuleA::class);
+        $rules = $this->registry->all();
+
+        $this->assertArrayHasKey('mock_rule', $rules);
+        $this->assertEquals(MockRuleA::class, $rules['mock_rule']);
+    }
+
+    public function testResolveReturnsRuleInstance(): void
+    {
+        $this->registry->register(MockRuleA::class);
+        $instance = $this->registry->resolve('mock_rule');
+
+        $this->assertInstanceOf(MockRuleA::class, $instance);
+    }
+
+    public function testResolveWithAliasReturnsRuleInstance(): void
+    {
+        $this->registry->register(MockRuleA::class);
+        $instance = $this->registry->resolve('alias_a');
+
+        $this->assertInstanceOf(MockRuleA::class, $instance);
+    }
+
+    public function testResolveWithRuleIdReturnsRuleInstance(): void
+    {
+        $this->registry->register(MockRuleWithRuleId::class);
+        $instance = $this->registry->resolve(RuleId::REQUIRED);
+
+        $this->assertInstanceOf(MockRuleWithRuleId::class, $instance);
+    }
+
+    public function testResolveUnknownRuleThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown rule: unknown');
+
+        $this->registry->resolve('unknown');
+    }
 }
 
 /**
@@ -77,6 +120,12 @@ class MockRuleB implements RuleInterface
 
 #[RuleName('another_rule', ['alias_a'])]
 class MockRuleWithDuplicateAlias implements RuleInterface
+{
+    public function validate(mixed $value, string $field, ValidationContext $context): ?array { return null; }
+}
+
+#[RuleName(RuleId::REQUIRED)]
+class MockRuleWithRuleId implements RuleInterface
 {
     public function validate(mixed $value, string $field, ValidationContext $context): ?array { return null; }
 }

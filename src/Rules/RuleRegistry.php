@@ -163,6 +163,33 @@ final class RuleRegistry
     }
 
     /**
+     * Get all registered rules.
+     *
+     * @return array<string, class-string<RuleInterface>>
+     */
+    public function all(): array
+    {
+        return $this->rules;
+    }
+
+    /**
+     * Resolve a rule instance by name, alias, or RuleId.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function resolve(string|RuleId $name): RuleInterface
+    {
+        $class = $this->get($name);
+
+        if ($class === null) {
+            $nameStr = $name instanceof RuleId ? $name->value : $name;
+            throw new InvalidArgumentException("Unknown rule: $nameStr");
+        }
+
+        return new $class();
+    }
+
+    /**
      * Register all built-in rules.
      */
     public function registerBuiltInRules(): void
