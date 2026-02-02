@@ -11,18 +11,20 @@ final class CompiledSchema
     /** @var list<CompiledField> */
     private array $fields;
 
-    private ?ValidatorEngine $engine = null;
+    private array $rulesArray;
 
     /** @param list<CompiledField> $fields */
-    private function __construct(array $fields)
+    private function __construct(array $fields, array $rulesArray = [])
     {
         $this->fields = $fields;
+        $this->rulesArray = $rulesArray;
     }
 
     /**
      * @param array<string, FieldDefinition> $fieldDefinitions
+     * @param array<string, mixed> $rulesArray
      */
-    public static function fromFieldDefinitions(array $fieldDefinitions): self
+    public static function fromFieldDefinitions(array $fieldDefinitions, array $rulesArray = []): self
     {
         $compiled = [];
 
@@ -30,7 +32,15 @@ final class CompiledSchema
             $compiled[] = CompiledField::fromFieldDefinition($definition);
         }
 
-        return new self($compiled);
+        return new self($compiled, $rulesArray);
+    }
+    
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRulesArray(): array
+    {
+        return $this->rulesArray;
     }
 
     /**

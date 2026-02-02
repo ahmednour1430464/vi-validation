@@ -8,8 +8,8 @@ use Vi\Validation\Execution\CompiledSchema;
 
 final class SchemaBuilder
 {
-    /** @var array<string, FieldDefinition> */
-    private array $fields = [];
+    /** @var array<string, mixed> */
+    private array $rulesArray = [];
 
     public function field(string $name): FieldDefinition
     {
@@ -20,8 +20,16 @@ final class SchemaBuilder
         return $this->fields[$name];
     }
 
+    /**
+     * @param array<string, mixed> $rules
+     */
+    public function setRulesArray(array $rules): void
+    {
+        $this->rulesArray = $rules;
+    }
+
     public function compile(): CompiledSchema
     {
-        return CompiledSchema::fromFieldDefinitions($this->fields);
+        return CompiledSchema::fromFieldDefinitions($this->fields, $this->rulesArray);
     }
 }

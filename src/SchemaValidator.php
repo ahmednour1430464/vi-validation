@@ -14,23 +14,55 @@ final class SchemaValidator
 {
     private CompiledSchema $schema;
     private ValidatorEngine $engine;
+    private \Vi\Validation\Compilation\ValidatorCompiler $compiler;
+    private ?\Vi\Validation\Messages\MessageResolver $messageResolver;
 
-    public function __construct(CompiledSchema $schema, ?ValidatorEngine $engine = null)
-    {
+    public function __construct(
+        CompiledSchema $schema,
+        ?ValidatorEngine $engine = null,
+        ?\Vi\Validation\Compilation\ValidatorCompiler $compiler = null,
+        ?\Vi\Validation\Messages\MessageResolver $messageResolver = null
+    ) {
         $this->schema = $schema;
         $this->engine = $engine ?? new ValidatorEngine();
+        $this->compiler = $compiler ?? new \Vi\Validation\Compilation\ValidatorCompiler();
+        $this->messageResolver = $messageResolver;
     }
 
-    public static function build(callable $definition): self
+    /**
+     * @param array<string, mixed> $rules
+     */
+    public static function build(callable $definition, array $config = [], array $rulesArray = []): self
     {
         $builder = new SchemaBuilder();
+        if (!empty($rulesArray)) {
+            $builder->setRulesArray($rulesArray);
+        }
         $definition($builder);
 
-        return new self($builder->compile());
+        $compiler = new \Vi\Validation\Compilation\ValidatorCompiler(
+            null,
+            $config['compilation']['precompile'] ?? false,
+            $config['compilation']['cache_path'] ?? null
+        );
+
+        return new self($builder->compile(), null, $compiler);
     }
 
     public function validate(array $data): ValidationResult
     {
+        // Check for native precompiled validator first (highest speed)
+        $nativeKey = \Vi\Validation\Compilation\NativeCompiler::generateKey($this->schema->getRulesArray());
+        $nativePath = $this->compiler->getNativePath($nativeKey);
+
+        if (file_exists($nativePath)) {
+            $closure = require $nativePath;
+            if (is_callable($closure)) {
+                $nativeValidator = new \Vi\Validation\Execution\NativeValidator($closure, $this->messageResolver);
+                return $nativeValidator->validate($data);
+            }
+        }
+
         return $this->engine->validate($this->schema, $data);
     }
 
