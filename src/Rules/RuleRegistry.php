@@ -59,20 +59,28 @@ final class RuleRegistry
     }
 
     /**
-     * Check if a rule exists by name or alias.
+     * Check if a rule exists by name, alias, or RuleId.
      */
-    public function has(string $name): bool
+    public function has(string|RuleId $name): bool
     {
+        if ($name instanceof RuleId) {
+            $name = $name->value;
+        }
+
         return isset($this->rules[$name]) || isset($this->aliases[$name]);
     }
 
     /**
-     * Get the class string for a rule by name or alias.
+     * Get the class string for a rule by name, alias, or RuleId.
      *
      * @return class-string<RuleInterface>|null
      */
-    public function get(string $name): ?string
+    public function get(string|RuleId $name): ?string
     {
+        if ($name instanceof RuleId) {
+            $name = $name->value;
+        }
+
         if (isset($this->rules[$name])) {
             return $this->rules[$name];
         }

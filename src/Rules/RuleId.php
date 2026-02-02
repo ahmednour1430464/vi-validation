@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vi\Validation\Rules;
+
+/**
+ * Enumeration of all built-in validation rule IDs.
+ */
+enum RuleId: string
+{
+    case ACCEPTED = 'accepted';
+    case ACCEPTED_IF = 'accepted_if';
+    case ACTIVE_URL = 'active_url';
+    case AFTER = 'after';
+    case AFTER_OR_EQUAL = 'after_or_equal';
+    case ALPHA = 'alpha';
+    case ALPHA_DASH = 'alpha_dash';
+    case ALPHA_NUM = 'alpha_num';
+    case ARRAY = 'array';
+    case ASCII = 'ascii';
+    case BAIL = 'bail';
+    case BEFORE = 'before';
+    case BEFORE_OR_EQUAL = 'before_or_equal';
+    case BETWEEN = 'between';
+    case BOOLEAN = 'boolean';
+    case CLOSURE = 'closure';
+    case CONFIRMED = 'confirmed';
+    case COUNTRY = 'country';
+    case CURRENT_PASSWORD = 'current_password';
+    case DATE = 'date';
+    case DATE_EQUALS = 'date_equals';
+    case DATE_FORMAT = 'date_format';
+    case DECIMAL = 'decimal';
+    case DECLINED = 'declined';
+    case DECLINED_IF = 'declined_if';
+    case DIFFERENT = 'different';
+    case DIGITS = 'digits';
+    case DIGITS_BETWEEN = 'digits_between';
+    case DIMENSIONS = 'dimensions';
+    case DISTINCT = 'distinct';
+    case DOESNT_END_WITH = 'doesnt_end_with';
+    case DOESNT_START_WITH = 'doesnt_start_with';
+    case EMAIL = 'email';
+    case ENDS_WITH = 'ends_with';
+    case ENUM = 'enum';
+    case EXCLUDE = 'exclude';
+    case EXCLUDE_IF = 'exclude_if';
+    case EXCLUDE_UNLESS = 'exclude_unless';
+    case EXCLUDE_WITH = 'exclude_with';
+    case EXCLUDE_WITHOUT = 'exclude_without';
+    case EXISTS = 'exists';
+    case EXTENSIONS = 'extensions';
+    case FILE = 'file';
+    case FILLED = 'filled';
+    case GT = 'gt';
+    case GTE = 'gte';
+    case IMAGE = 'image';
+    case IN = 'in';
+    case INTEGER = 'integer';
+    case IP = 'ip';
+    case JSON = 'json';
+    case LANGUAGE = 'language';
+    case LT = 'lt';
+    case LTE = 'lte';
+    case LIST = 'list';
+    case LOWERCASE = 'lowercase';
+    case MAC_ADDRESS = 'mac_address';
+    case MAX = 'max';
+    case MAX_FILE_SIZE = 'max_file_size';
+    case MIMES = 'mimes';
+    case MIMETYPES = 'mimetypes';
+    case MIN = 'min';
+    case MIN_FILE_SIZE = 'min_file_size';
+    case MISSING = 'missing';
+    case MISSING_IF = 'missing_if';
+    case MISSING_UNLESS = 'missing_unless';
+    case MISSING_WITH = 'missing_with';
+    case MISSING_WITH_ALL = 'missing_with_all';
+    case MULTIPLE_OF = 'multiple_of';
+    case NOT_IN = 'not_in';
+    case NOT_REGEX = 'not_regex';
+    case NULLABLE = 'nullable';
+    case NUMERIC = 'numeric';
+    case PASSWORD = 'password';
+    case PRESENT = 'present';
+    case PROHIBITED = 'prohibited';
+    case PROHIBITED_IF = 'prohibited_if';
+    case PROHIBITED_UNLESS = 'prohibited_unless';
+    case PROHIBITS = 'prohibits';
+    case REGEX = 'regex';
+    case REQUIRED = 'required';
+    case REQUIRED_ARRAY_KEYS = 'required_array_keys';
+    case REQUIRED_IF = 'required_if';
+    case REQUIRED_IF_ACCEPTED = 'required_if_accepted';
+    case REQUIRED_UNLESS = 'required_unless';
+    case REQUIRED_WITH = 'required_with';
+    case REQUIRED_WITH_ALL = 'required_with_all';
+    case REQUIRED_WITHOUT = 'required_without';
+    case REQUIRED_WITHOUT_ALL = 'required_without_all';
+    case SAME = 'same';
+    case SIZE = 'size';
+    case SOMETIMES = 'sometimes';
+    case STARTS_WITH = 'starts_with';
+    case STRING = 'string';
+    case TIMEZONE = 'timezone';
+    case ULID = 'ulid';
+    case UNIQUE = 'unique';
+    case UPPERCASE = 'uppercase';
+    case URL = 'url';
+    case UUID = 'uuid';
+}
