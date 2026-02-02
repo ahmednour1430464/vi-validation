@@ -11,10 +11,33 @@ final class ValidationContext
 
     private ErrorCollector $errors;
 
+    private ?DatabaseValidatorInterface $databaseValidator = null;
+    private ?PasswordHasherInterface $passwordHasher = null;
+
     public function __construct(array $data, ErrorCollector $errors)
     {
         $this->data = $data;
         $this->errors = $errors;
+    }
+
+    public function getDatabaseValidator(): ?DatabaseValidatorInterface
+    {
+        return $this->databaseValidator;
+    }
+
+    public function setDatabaseValidator(?DatabaseValidatorInterface $databaseValidator): void
+    {
+        $this->databaseValidator = $databaseValidator;
+    }
+
+    public function getPasswordHasher(): ?PasswordHasherInterface
+    {
+        return $this->passwordHasher;
+    }
+
+    public function setPasswordHasher(?PasswordHasherInterface $passwordHasher): void
+    {
+        $this->passwordHasher = $passwordHasher;
     }
 
     public function getValue(string $field): mixed
@@ -32,6 +55,21 @@ final class ValidationContext
         }
 
         return $level1[$second] ?? null;
+    }
+
+    public function hasValue(string $field): bool
+    {
+        if (strpos($field, '.') === false) {
+            return array_key_exists($field, $this->data);
+        }
+
+        [$first, $second] = explode('.', $field, 2);
+
+        if (!array_key_exists($first, $this->data) || !is_array($this->data[$first])) {
+            return false;
+        }
+
+        return array_key_exists($second, $this->data[$first]);
     }
 
     /**

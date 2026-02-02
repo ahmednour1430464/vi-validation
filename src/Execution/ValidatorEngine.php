@@ -17,6 +17,9 @@ final class ValidatorEngine
     private ?ErrorCollector $errors = null;
     private ?ValidationContext $context = null;
 
+    private ?\Vi\Validation\Rules\DatabaseValidatorInterface $databaseValidator = null;
+    private ?\Vi\Validation\Rules\PasswordHasherInterface $passwordHasher = null;
+
     public function __construct(
         ?MessageResolver $messageResolver = null,
         bool $failFast = false,
@@ -37,16 +40,32 @@ final class ValidatorEngine
             $this->context->setData($data);
         }
 
+        $this->context->setDatabaseValidator($this->databaseValidator);
+        $this->context->setPasswordHasher($this->passwordHasher);
+
         $errors = $this->errors;
         $context = $this->context;
+        $excludedFields = [];
 
         foreach ($schema->getFields() as $field) {
             if ($this->shouldStopValidation($errors)) {
                 break;
             }
 
-            $value = $field->getValue($data);
+            $name = $field->getName();
 
+            // Handle exclusion rules
+            if ($field->shouldExclude($context)) {
+                $excludedFields[] = $name;
+                continue;
+            }
+
+            // Handle 'sometimes' rule: skip if field is not present in data
+            if ($field->isSometimes() && !$context->hasValue($name)) {
+                continue;
+            }
+
+            $value = $field->getValue($data);
             $rules = $field->getRules();
             $isNullable = $field->isNullable();
 
@@ -55,7 +74,12 @@ final class ValidatorEngine
             }
 
             foreach ($rules as $rule) {
-                if ($this->applyRule($rule, $field->getName(), $value, $context)) {
+                if ($this->applyRule($rule, $name, $value, $context)) {
+                    // Handle 'bail' rule: stop validating this field after first failure
+                    if ($field->isBail()) {
+                        break;
+                    }
+
                     if ($this->shouldStopValidation($errors)) {
                         break;
                     }
@@ -63,7 +87,7 @@ final class ValidatorEngine
             }
         }
 
-        return new ValidationResult($errors->all(), $data, $this->messageResolver);
+        return new ValidationResult($errors->all(), $data, $this->messageResolver, $excludedFields);
     }
 
     public function setFailFast(bool $failFast): void
@@ -79,6 +103,16 @@ final class ValidatorEngine
     public function setMessageResolver(MessageResolver $resolver): void
     {
         $this->messageResolver = $resolver;
+    }
+
+    public function setDatabaseValidator(?\Vi\Validation\Rules\DatabaseValidatorInterface $validator): void
+    {
+        $this->databaseValidator = $validator;
+    }
+
+    public function setPasswordHasher(?\Vi\Validation\Rules\PasswordHasherInterface $hasher): void
+    {
+        $this->passwordHasher = $hasher;
     }
 
 

@@ -12,11 +12,14 @@ final class ValidationResult
     private array $errors;
     private ?MessageResolver $messageResolver;
     private array $data;
+    /** @var list<string> */
+    private array $excludedFields;
 
     /**
      * @param ErrorCollector|array<string, list<array{rule: string, message: string|null}>> $errors
+     * @param list<string> $excludedFields
      */
-    public function __construct($errors, array $data = [], ?MessageResolver $messageResolver = null)
+    public function __construct($errors, array $data = [], ?MessageResolver $messageResolver = null, array $excludedFields = [])
     {
         if ($errors instanceof ErrorCollector) {
             $this->errors = $errors->all();
@@ -25,14 +28,32 @@ final class ValidationResult
         }
         $this->data = $data;
         $this->messageResolver = $messageResolver;
+        $this->excludedFields = $excludedFields;
     }
 
     /**
-     * Get the validated data.
+     * Get the validated data (including excluded fields).
      */
     public function data(): array
     {
         return $this->data;
+    }
+
+    /**
+     * Get the validated data excluding fields that were marked for exclusion.
+     */
+    public function validated(): array
+    {
+        $validated = $this->data;
+
+        foreach ($this->excludedFields as $field) {
+            // Simple depth-1 removal for now
+            if (isset($validated[$field])) {
+                unset($validated[$field]);
+            }
+        }
+
+        return $validated;
     }
 
     public function isValid(): bool

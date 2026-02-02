@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vi\Validation\Rules;
+
+use Vi\Validation\Execution\ValidationContext;
+
+#[RuleName('ascii')]
+final class AsciiRule implements RuleInterface
+{
+    public function validate(mixed $value, string $field, ValidationContext $context): ?array
+    {
+        if ($value === null || !is_string($value)) {
+            return null;
+        }
+
+        if (mb_check_encoding($value, 'ASCII')) {
+            return null;
+        }
+
+        return ['rule' => 'ascii'];
+    }
+}

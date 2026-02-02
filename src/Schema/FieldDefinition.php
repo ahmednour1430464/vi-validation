@@ -33,6 +33,18 @@ final class FieldDefinition
         return $this;
     }
 
+    public function bail(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\BailRule();
+        return $this;
+    }
+
+    public function sometimes(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\SometimesRule();
+        return $this;
+    }
+
     public function string(): self
     {
         $this->rules[] = new \Vi\Validation\Rules\StringTypeRule();
@@ -42,6 +54,12 @@ final class FieldDefinition
     public function integer(): self
     {
         $this->rules[] = new \Vi\Validation\Rules\IntegerTypeRule();
+        return $this;
+    }
+
+    public function decimal(int $min, ?int $max = null): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DecimalRule($min, $max);
         return $this;
     }
 
@@ -65,6 +83,12 @@ final class FieldDefinition
     public function array(): self
     {
         $this->rules[] = new \Vi\Validation\Rules\ArrayRule();
+        return $this;
+    }
+
+    public function list(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ListRule();
         return $this;
     }
 
@@ -140,6 +164,18 @@ final class FieldDefinition
         return $this;
     }
 
+    public function exists(string $table, string $column = 'id', array $extraConstraints = []): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExistsRule($table, $column, $extraConstraints);
+        return $this;
+    }
+
+    public function unique(string $table, string $column = 'id', mixed $ignoreId = null, string $idColumn = 'id', array $extraConstraints = []): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\UniqueRule($table, $column, $ignoreId, $idColumn, $extraConstraints);
+        return $this;
+    }
+
     public function between(int|float $min, int|float $max): self
     {
         $this->rules[] = new \Vi\Validation\Rules\BetweenRule($min, $max);
@@ -200,6 +236,30 @@ final class FieldDefinition
         return $this;
     }
 
+    public function minFileSize(int $kb): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MinFileSizeRule($kb);
+        return $this;
+    }
+
+    public function mimetypes(string ...$types): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MimetypesRule(...$types);
+        return $this;
+    }
+
+    public function extensions(string ...$extensions): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExtensionsRule(...$extensions);
+        return $this;
+    }
+
+    public function dimensions(array $constraints): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DimensionsRule($constraints);
+        return $this;
+    }
+
     public function rules(RuleInterface ...$rules): self
     {
         array_push($this->rules, ...$rules);
@@ -231,9 +291,49 @@ final class FieldDefinition
         return $this;
     }
 
+    public function country(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\CountryRule();
+        return $this;
+    }
+
+    public function language(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\LanguageRule();
+        return $this;
+    }
+
+    public function ascii(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\AsciiRule();
+        return $this;
+    }
+
     public function uppercase(): self
     {
         $this->rules[] = new \Vi\Validation\Rules\UppercaseRule();
+        return $this;
+    }
+
+    public function enum(string $enumClass): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\EnumRule($enumClass);
+        return $this;
+    }
+
+    public function password(?callable $callback = null): self
+    {
+        $rule = new \Vi\Validation\Rules\PasswordRule();
+        if ($callback) {
+            $callback($rule);
+        }
+        $this->rules[] = $rule;
+        return $this;
+    }
+
+    public function currentPassword(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\CurrentPasswordRule();
         return $this;
     }
 
@@ -293,6 +393,18 @@ final class FieldDefinition
         return $this;
     }
 
+    public function requiredIf(string $otherField, array $values): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredIfRule($otherField, $values);
+        return $this;
+    }
+
+    public function requiredIfAccepted(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredIfAcceptedRule($otherField);
+        return $this;
+    }
+
     public function prohibitedIf(string $otherField, array $values): self
     {
         $this->rules[] = new \Vi\Validation\Rules\ProhibitedIfRule($otherField, $values);
@@ -302,6 +414,84 @@ final class FieldDefinition
     public function prohibitedUnless(string $otherField, array $values): self
     {
         $this->rules[] = new \Vi\Validation\Rules\ProhibitedUnlessRule($otherField, $values);
+        return $this;
+    }
+
+    public function acceptedIf(string $otherField, mixed $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\AcceptedIfRule($otherField, $value);
+        return $this;
+    }
+
+    public function declinedIf(string $otherField, mixed $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DeclinedIfRule($otherField, $value);
+        return $this;
+    }
+
+    public function prohibits(string ...$fields): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ProhibitsRule(...$fields);
+        return $this;
+    }
+
+    public function missing(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MissingRule();
+        return $this;
+    }
+
+    public function missingIf(string $otherField, mixed $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MissingIfRule($otherField, $value);
+        return $this;
+    }
+
+    public function missingUnless(string $otherField, mixed $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MissingUnlessRule($otherField, $value);
+        return $this;
+    }
+
+    public function missingWith(string ...$others): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MissingWithRule(...$others);
+        return $this;
+    }
+
+    public function missingWithAll(string ...$others): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\MissingWithAllRule(...$others);
+        return $this;
+    }
+
+    public function exclude(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExcludeRule();
+        return $this;
+    }
+
+    public function excludeIf(string $otherField, mixed $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExcludeIfRule($otherField, $value);
+        return $this;
+    }
+
+    public function excludeUnless(string $otherField, mixed $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExcludeUnlessRule($otherField, $value);
+        return $this;
+    }
+
+    public function excludeWith(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExcludeWithRule($otherField);
+        return $this;
+    }
+
+    public function excludeWithout(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\ExcludeWithoutRule($otherField);
         return $this;
     }
 
