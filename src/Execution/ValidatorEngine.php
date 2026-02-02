@@ -138,15 +138,8 @@ final class ValidatorEngine
         $error = $rule->validate($value, $field, $context);
 
         if ($error !== null) {
-            $message = $error['message'] ?? null;
-            
-            // Resolve message if MessageResolver is available and no custom message was provided
-            if ($message === null && $this->messageResolver !== null) {
-                $params = $error['parameters'] ?? $error['params'] ?? [];
-                $message = $this->messageResolver->resolve($field, $error['rule'], $params);
-            }
-
-            $context->addError($field, $error['rule'], $message);
+            $params = $error['parameters'] ?? $error['params'] ?? [];
+            $context->addError($field, $error['rule'], $error['message'] ?? null, $params);
             return true;
         }
 

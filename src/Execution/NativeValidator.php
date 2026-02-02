@@ -28,19 +28,8 @@ final class NativeValidator
     {
         $result = ($this->closure)($data);
 
-        // Map errors to include resolved messages if needed
-        $errors = $result['errors'];
-        foreach ($errors as $field => &$fieldErrors) {
-            foreach ($fieldErrors as &$error) {
-                if ($error['message'] === null && $this->messageResolver !== null) {
-                    $params = $error['params'] ?? [];
-                    $error['message'] = $this->messageResolver->resolve($field, $error['rule'], $params);
-                }
-            }
-        }
-
         return new ValidationResult(
-            $errors,
+            $result['errors'],
             $data,
             $this->messageResolver,
             $result['excluded_fields'] ?? []

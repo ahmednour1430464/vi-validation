@@ -49,17 +49,23 @@ final class SchemaValidator
         return new self($builder->compile(), null, $compiler);
     }
 
+    private ?\Vi\Validation\Execution\NativeValidator $cachedNativeValidator = null;
+
     public function validate(array $data): ValidationResult
     {
-        // Check for native precompiled validator first (highest speed)
+        if ($this->cachedNativeValidator !== null) {
+            return $this->cachedNativeValidator->validate($data);
+        }
+
+        // Check for native precompiled validator (highest speed)
         $nativeKey = \Vi\Validation\Compilation\NativeCompiler::generateKey($this->schema->getRulesArray());
         $nativePath = $this->compiler->getNativePath($nativeKey);
 
         if (file_exists($nativePath)) {
             $closure = require $nativePath;
             if (is_callable($closure)) {
-                $nativeValidator = new \Vi\Validation\Execution\NativeValidator($closure, $this->messageResolver);
-                return $nativeValidator->validate($data);
+                $this->cachedNativeValidator = new \Vi\Validation\Execution\NativeValidator($closure, $this->messageResolver);
+                return $this->cachedNativeValidator->validate($data);
             }
         }
 

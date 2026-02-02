@@ -6,15 +6,19 @@ namespace Vi\Validation\Execution;
 
 final class ErrorCollector
 {
-    /** @var array<string, list<array{rule: string, message: string|null}>> */
+    /** @var array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>> */
     private array $errors = [];
 
     private int $errorCount = 0;
 
-    public function add(string $field, string $rule, ?string $message = null): void
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function add(string $field, string $rule, ?string $message = null, array $params = []): void
     {
         $this->errors[$field][] = [
             'rule' => $rule,
+            'params' => $params,
             'message' => $message,
         ];
         $this->errorCount++;

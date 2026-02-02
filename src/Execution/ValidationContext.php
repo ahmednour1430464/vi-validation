@@ -87,8 +87,11 @@ final class ValidationContext
         $this->data = $data;
     }
 
-    public function addError(string $field, string $rule, ?string $message = null): void
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function addError(string $field, string $rule, ?string $message = null, array $params = []): void
     {
-        $this->errors->add($field, $rule, $message);
+        $this->errors->add($field, $rule, $message, $params);
     }
 }

@@ -8,7 +8,7 @@ use Vi\Validation\Messages\MessageResolver;
 
 final class ValidationResult
 {
-    /** @var array<string, list<array{rule: string, message: string|null}>> */
+    /** @var array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>> */
     private array $errors;
     private ?MessageResolver $messageResolver;
     private array $data;
@@ -16,7 +16,7 @@ final class ValidationResult
     private array $excludedFields;
 
     /**
-     * @param ErrorCollector|array<string, list<array{rule: string, message: string|null}>> $errors
+     * @param ErrorCollector|array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>> $errors
      * @param list<string> $excludedFields
      */
     public function __construct($errors, array $data = [], ?MessageResolver $messageResolver = null, array $excludedFields = [])
@@ -82,9 +82,13 @@ final class ValidationResult
         foreach ($rawErrors as $field => $fieldErrors) {
             $messages[$field] = [];
             foreach ($fieldErrors as $error) {
-                // Use the pre-resolved message if available, otherwise use rule name
-                $message = $error['message'] ?? $error['rule'];
-                $messages[$field][] = $message;
+                $message = $error['message'];
+                
+                if ($message === null && $this->messageResolver !== null) {
+                    $message = $this->messageResolver->resolve($field, $error['rule'], $error['params'] ?? []);
+                }
+
+                $messages[$field][] = $message ?? $error['rule'];
             }
         }
 
