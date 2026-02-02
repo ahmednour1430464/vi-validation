@@ -7,6 +7,14 @@ namespace Vi\Validation\Execution;
 use Vi\Validation\Rules\RuleInterface;
 use Vi\Validation\Schema\FieldDefinition;
 
+final class CompiledField
+{
+    private string $name;
+    /** @var list<RuleInterface> */
+    private array $rules;
+    private bool $isNullable;
+    private bool $isBail;
+    private bool $isSometimes;
     private bool $isNested;
     private ?string $parentField = null;
     private ?string $childField = null;

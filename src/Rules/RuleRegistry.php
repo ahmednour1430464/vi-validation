@@ -52,7 +52,7 @@ final class RuleRegistry
         $metadata = self::$metadataCache[$class];
         $name = $metadata['name'];
 
-        // Safeguard: Check for duplicate rule name
+        // Safeguard: Check for duplicate rule name or collision with existing alias
         if (isset($this->rules[$name]) && $this->rules[$name] !== $class) {
             throw new LogicException(sprintf(
                 'Rule name "%s" is already registered by class "%s". Conflict with "%s".',
@@ -62,10 +62,39 @@ final class RuleRegistry
             ));
         }
 
+        if (isset($this->aliases[$name])) {
+            $existingRuleName = $this->aliases[$name];
+            $existingClass = $this->rules[$existingRuleName];
+            
+            if ($existingClass !== $class) {
+                throw new LogicException(sprintf(
+                    'Rule name "%s" is already registered as an alias for rule "%s" (%s). Conflict with "%s".',
+                    $name,
+                    $existingRuleName,
+                    $existingClass,
+                    $class
+                ));
+            }
+        }
+
         $this->rules[$name] = $class;
 
         foreach ($metadata['aliases'] as $alias) {
-            // Safeguard: Check for duplicate alias
+            // Safeguard: Check for duplicate alias or collision with existing primary name
+            if (isset($this->rules[$alias])) {
+                $existingClass = $this->rules[$alias];
+
+                if ($existingClass !== $class) {
+                    throw new LogicException(sprintf(
+                        'Alias "%s" is already registered as a primary rule name for class "%s". Conflict with rule "%s" (%s).',
+                        $alias,
+                        $existingClass,
+                        $name,
+                        $class
+                    ));
+                }
+            }
+
             if (isset($this->aliases[$alias])) {
                 $existingRuleName = $this->aliases[$alias];
                 $existingClass = $this->rules[$existingRuleName];
