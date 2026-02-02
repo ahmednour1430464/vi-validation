@@ -210,6 +210,7 @@ final class RuleRegistry
             AsciiRule::class,
             BetweenRule::class,
             BooleanRule::class,
+            ConditionalRule::class,
             ClosureRule::class,
             ConfirmedRule::class,
             CountryRule::class,

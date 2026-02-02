@@ -24,6 +24,7 @@ enum RuleId: string
     case BEFORE_OR_EQUAL = 'before_or_equal';
     case BETWEEN = 'between';
     case BOOLEAN = 'boolean';
+    case CONDITIONAL = 'conditional';
     case CLOSURE = 'closure';
     case CONFIRMED = 'confirmed';
     case COUNTRY = 'country';

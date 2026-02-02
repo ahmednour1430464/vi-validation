@@ -51,10 +51,20 @@ final class FieldDefinition
         return $this;
     }
 
+    public function str(): self
+    {
+        return $this->string();
+    }
+
     public function integer(): self
     {
         $this->rules[] = new \Vi\Validation\Rules\IntegerTypeRule();
         return $this;
+    }
+
+    public function int(): self
+    {
+        return $this->integer();
     }
 
     public function decimal(int $min, ?int $max = null): self
@@ -92,6 +102,12 @@ final class FieldDefinition
         return $this;
     }
 
+    public function distinct(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DistinctRule();
+        return $this;
+    }
+
     public function date(?string $format = null): self
     {
         $this->rules[] = new \Vi\Validation\Rules\DateRule($format);
@@ -125,6 +141,30 @@ final class FieldDefinition
     public function max(int|float $max): self
     {
         $this->rules[] = new \Vi\Validation\Rules\MaxRule($max);
+        return $this;
+    }
+
+    public function gt(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\GreaterThanRule($otherField);
+        return $this;
+    }
+
+    public function gte(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\GreaterThanOrEqualRule($otherField);
+        return $this;
+    }
+
+    public function lt(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\LessThanRule($otherField);
+        return $this;
+    }
+
+    public function lte(string $otherField): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\LessThanOrEqualRule($otherField);
         return $this;
     }
 
@@ -362,6 +402,30 @@ final class FieldDefinition
         return $this;
     }
 
+    public function digits(int $value): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DigitsRule($value);
+        return $this;
+    }
+
+    public function digitsBetween(int $min, int $max): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\DigitsBetweenRule($min, $max);
+        return $this;
+    }
+
+    public function startsWith(string ...$needles): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\StartsWithRule($needles);
+        return $this;
+    }
+
+    public function endsWith(string ...$needles): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\EndsWithRule($needles);
+        return $this;
+    }
+
     // Phase 3: Advanced Logic
     public function notRegex(string $pattern): self
     {
@@ -402,6 +466,48 @@ final class FieldDefinition
     public function requiredIfAccepted(string $otherField): self
     {
         $this->rules[] = new \Vi\Validation\Rules\RequiredIfAcceptedRule($otherField);
+        return $this;
+    }
+
+    public function requiredUnless(string $otherField, array $values): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredUnlessRule($otherField, $values);
+        return $this;
+    }
+
+    public function requiredWith(string ...$others): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredWithRule($others);
+        return $this;
+    }
+
+    public function requiredWithAll(string ...$others): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredWithAllRule($others);
+        return $this;
+    }
+
+    public function requiredWithout(string ...$others): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredWithoutRule($others);
+        return $this;
+    }
+
+    public function requiredWithoutAll(string ...$others): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\RequiredWithoutAllRule($others);
+        return $this;
+    }
+
+    public function present(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\PresentRule();
+        return $this;
+    }
+
+    public function filled(): self
+    {
+        $this->rules[] = new \Vi\Validation\Rules\FilledRule();
         return $this;
     }
 
@@ -492,6 +598,26 @@ final class FieldDefinition
     public function excludeWithout(string $otherField): self
     {
         $this->rules[] = new \Vi\Validation\Rules\ExcludeWithoutRule($otherField);
+        return $this;
+    }
+
+    public function when($condition, callable $onTrue, ?callable $onFalse = null): self
+    {
+        // We create a temporary builder to collect rules for onTrue and onFalse
+        $trueBuilder = new SchemaBuilder();
+        $trueField = new FieldDefinition($this->name, $trueBuilder);
+        $onTrue($trueField);
+        $trueRules = $trueField->getRules();
+
+        $falseRules = [];
+        if ($onFalse) {
+            $falseBuilder = new SchemaBuilder();
+            $falseField = new FieldDefinition($this->name, $falseBuilder);
+            $onFalse($falseField);
+            $falseRules = $falseField->getRules();
+        }
+
+        $this->rules[] = new \Vi\Validation\Rules\ConditionalRule($condition, $trueRules, $falseRules);
         return $this;
     }
 

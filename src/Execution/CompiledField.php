@@ -12,9 +12,9 @@ final class CompiledField
     private string $name;
     /** @var list<RuleInterface> */
     private array $rules;
-    private bool $isNullable;
-    private bool $isBail;
-    private bool $isSometimes;
+    private bool $isNullable = false;
+    private bool $isBail = false;
+    private bool $isSometimes = false;
     private bool $isNested;
     private ?string $parentField = null;
     private ?string $childField = null;
@@ -37,15 +37,44 @@ final class CompiledField
             $this->isNested = false;
         }
 
-        $this->isNullable = false;
-        $this->isBail = false;
-        $this->isSometimes = false;
+        // Deduplicate rules: Keep only one instance of rules with the same class if they don't have unique state
+        // For simplicity now, we'll deduplicate by class for marker rules, 
+        // but for others we might need more complex logic.
+        $this->rules = $this->deduplicateAndReorderRules($rules);
+    }
+
+    /**
+     * @param list<RuleInterface> $rules
+     * @return list<RuleInterface>
+     */
+    private function deduplicateAndReorderRules(array $rules): array
+    {
+        $uniqueRules = [];
+        $hasRequired = false;
+        $hasNullable = false;
+        $hasBail = false;
+
+        $markerRules = [];
+        $otherRules = [];
 
         foreach ($rules as $rule) {
-            if ($rule instanceof \Vi\Validation\Rules\NullableRule) {
-                $this->isNullable = true;
+            if ($rule instanceof \Vi\Validation\Rules\RequiredRule) {
+                if (!$hasRequired) {
+                    $hasRequired = true;
+                    $markerRules[] = $rule;
+                }
+            } elseif ($rule instanceof \Vi\Validation\Rules\NullableRule) {
+                if (!$hasNullable) {
+                    $hasNullable = true;
+                    $this->isNullable = true;
+                    $markerRules[] = $rule;
+                }
             } elseif ($rule instanceof \Vi\Validation\Rules\BailRule) {
-                $this->isBail = true;
+                if (!$hasBail) {
+                    $hasBail = true;
+                    $this->isBail = true;
+                    $markerRules[] = $rule;
+                }
             } elseif ($rule instanceof \Vi\Validation\Rules\SometimesRule) {
                 $this->isSometimes = true;
             } elseif ($rule instanceof \Vi\Validation\Rules\ExcludeRule) {
@@ -57,29 +86,30 @@ final class CompiledField
                 $rule instanceof \Vi\Validation\Rules\ExcludeWithoutRule
             ) {
                 $this->exclusionRules[] = $rule;
+            } else {
+                $otherRules[] = $rule;
             }
         }
 
-        // Optimization: Remove marker rules from runtime rules to avoid checking them during validation
-        $markerClasses = [
-            \Vi\Validation\Rules\NullableRule::class,
-            \Vi\Validation\Rules\BailRule::class,
-            \Vi\Validation\Rules\SometimesRule::class,
-            \Vi\Validation\Rules\ExcludeRule::class,
-            \Vi\Validation\Rules\ExcludeIfRule::class,
-            \Vi\Validation\Rules\ExcludeUnlessRule::class,
-            \Vi\Validation\Rules\ExcludeWithRule::class,
-            \Vi\Validation\Rules\ExcludeWithoutRule::class,
-        ];
+        // Fast-fail order: Bail -> Required -> Nullable -> Others
+        $finalRules = [];
+        
+        // Find markers in specific order
+        $bailMarker = null;
+        $requiredMarker = null;
+        $nullableMarker = null;
 
-        $this->rules = array_values(array_filter($rules, function ($r) use ($markerClasses) {
-            foreach ($markerClasses as $class) {
-                if ($r instanceof $class) {
-                    return false;
-                }
-            }
-            return true;
-        }));
+        foreach ($markerRules as $rule) {
+            if ($rule instanceof \Vi\Validation\Rules\BailRule) $bailMarker = $rule;
+            if ($rule instanceof \Vi\Validation\Rules\RequiredRule) $requiredMarker = $rule;
+            if ($rule instanceof \Vi\Validation\Rules\NullableRule) $nullableMarker = $rule;
+        }
+
+        if ($bailMarker) $finalRules[] = $bailMarker;
+        if ($requiredMarker) $finalRules[] = $requiredMarker;
+        if ($nullableMarker) $finalRules[] = $nullableMarker;
+
+        return array_merge($finalRules, $otherRules);
     }
 
     public static function fromFieldDefinition(FieldDefinition $definition): self
