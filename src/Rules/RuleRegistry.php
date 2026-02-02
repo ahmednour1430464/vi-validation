@@ -6,6 +6,7 @@ namespace Vi\Validation\Rules;
 
 use ReflectionClass;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * Registry for validation rules to facilitate string-to-rule mapping.
@@ -51,9 +52,36 @@ final class RuleRegistry
         $metadata = self::$metadataCache[$class];
         $name = $metadata['name'];
 
+        // Safeguard: Check for duplicate rule name
+        if (isset($this->rules[$name]) && $this->rules[$name] !== $class) {
+            throw new LogicException(sprintf(
+                'Rule name "%s" is already registered by class "%s". Conflict with "%s".',
+                $name,
+                $this->rules[$name],
+                $class
+            ));
+        }
+
         $this->rules[$name] = $class;
 
         foreach ($metadata['aliases'] as $alias) {
+            // Safeguard: Check for duplicate alias
+            if (isset($this->aliases[$alias])) {
+                $existingRuleName = $this->aliases[$alias];
+                $existingClass = $this->rules[$existingRuleName];
+
+                if ($existingClass !== $class) {
+                    throw new LogicException(sprintf(
+                        'Alias "%s" is already registered for rule "%s" (%s). Conflict with rule "%s" (%s).',
+                        $alias,
+                        $existingRuleName,
+                        $existingClass,
+                        $name,
+                        $class
+                    ));
+                }
+            }
+
             $this->aliases[$alias] = $name;
         }
     }
