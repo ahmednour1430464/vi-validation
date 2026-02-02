@@ -18,6 +18,9 @@ final class RuleRegistry
     /** @var array<string, string> */
     private array $aliases = [];
 
+    /** @var array<class-string<RuleInterface>, array{name: string, aliases: array<string>}> */
+    private static array $metadataCache = [];
+
     /**
      * Register a single rule class by reading its #[RuleName] attribute.
      *
@@ -25,23 +28,32 @@ final class RuleRegistry
      */
     public function register(string $class): void
     {
-        $reflection = new ReflectionClass($class);
-        $attributes = $reflection->getAttributes(RuleName::class);
+        if (!isset(self::$metadataCache[$class])) {
+            $reflection = new ReflectionClass($class);
+            $attributes = $reflection->getAttributes(RuleName::class);
 
-        if (empty($attributes)) {
-            throw new InvalidArgumentException(sprintf(
-                'Class "%s" does not have the #[RuleName] attribute.',
-                $class
-            ));
+            if (empty($attributes)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Class "%s" does not have the #[RuleName] attribute.',
+                    $class
+                ));
+            }
+
+            /** @var RuleName $attribute */
+            $attribute = $attributes[0]->newInstance();
+
+            self::$metadataCache[$class] = [
+                'name' => $attribute->name,
+                'aliases' => $attribute->aliases,
+            ];
         }
 
-        /** @var RuleName $attribute */
-        $attribute = $attributes[0]->newInstance();
-        $name = $attribute->name;
+        $metadata = self::$metadataCache[$class];
+        $name = $metadata['name'];
 
         $this->rules[$name] = $class;
 
-        foreach ($attribute->aliases as $alias) {
+        foreach ($metadata['aliases'] as $alias) {
             $this->aliases[$alias] = $name;
         }
     }
