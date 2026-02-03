@@ -73,7 +73,14 @@ final class ValidatorEngine
                 continue;
             }
 
+            $isEmpty = ($value === null || (is_string($value) && $value === '') || (is_array($value) && $value === []));
+
             foreach ($rules as $rule) {
+                // Non-implicit rules should skip if the value is "empty"
+                if ($isEmpty && !$this->isImplicitRule($rule)) {
+                    continue;
+                }
+
                 if ($this->applyRule($rule, $name, $value, $context)) {
                     // Handle 'bail' rule: stop validating this field after first failure
                     if ($field->isBail()) {
@@ -116,6 +123,27 @@ final class ValidatorEngine
     }
 
 
+
+    private function isImplicitRule(RuleInterface $rule): bool
+    {
+        $class = get_class($rule);
+        return in_array($class, [
+            \Vi\Validation\Rules\RequiredRule::class,
+            \Vi\Validation\Rules\RequiredIfRule::class,
+            \Vi\Validation\Rules\RequiredUnlessRule::class,
+            \Vi\Validation\Rules\RequiredWithRule::class,
+            \Vi\Validation\Rules\RequiredWithAllRule::class,
+            \Vi\Validation\Rules\RequiredWithoutRule::class,
+            \Vi\Validation\Rules\RequiredWithoutAllRule::class,
+            \Vi\Validation\Rules\AcceptedRule::class,
+            \Vi\Validation\Rules\AcceptedIfRule::class,
+            \Vi\Validation\Rules\FilledRule::class,
+            \Vi\Validation\Rules\PresentRule::class,
+            \Vi\Validation\Rules\ProhibitedRule::class,
+            \Vi\Validation\Rules\ProhibitedIfRule::class,
+            \Vi\Validation\Rules\ProhibitedUnlessRule::class,
+        ], true);
+    }
 
     private function shouldStopValidation(ErrorCollector $errors): bool
     {

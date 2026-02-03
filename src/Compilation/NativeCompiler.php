@@ -132,10 +132,23 @@ final class NativeCompiler
     {
         $class = get_class($rule);
         
-        return match($class) {
+        // Non-implicit rules should skip if the value is "empty"
+        // Implicit rules (Required, Accepted, etc.) handle empty values themselves.
+        $isImplicit = $this->isImplicitRule($class);
+        $prefix = "";
+        $suffix = "";
+        
+        if (!$isImplicit) {
+            $prefix = "{$indent}if (!(\$val === null || (is_string(\$val) && \$val === '') || (is_array(\$val) && \$val === []))) {\n";
+            $prefix = str_replace("\$val", $valName, $prefix);
+            $indent .= "    ";
+            $suffix = substr($indent, 0, -4) . "}\n";
+        }
+
+        $code = match($class) {
             \Vi\Validation\Rules\RequiredRule::class => $this->inlineRequired($fieldName, $valName, $indent),
             \Vi\Validation\Rules\StringRule::class => $this->inlineType($fieldName, $valName, 'string', 'is_string', $indent),
-            \Vi\Validation\Rules\IntegerRule::class => $this->inlineType($fieldName, $valName, 'integer', 'is_int', $indent),
+            \Vi\Validation\Rules\IntegerTypeRule::class => $this->inlineInteger($fieldName, $valName, $indent),
             \Vi\Validation\Rules\NumericRule::class => $this->inlineType($fieldName, $valName, 'numeric', 'is_numeric', $indent),
             \Vi\Validation\Rules\BooleanRule::class => $this->inlineBoolean($fieldName, $valName, $indent),
             \Vi\Validation\Rules\ArrayRule::class => $this->inlineType($fieldName, $valName, 'array', 'is_array', $indent),
@@ -145,11 +158,45 @@ final class NativeCompiler
             \Vi\Validation\Rules\JsonRule::class => $this->inlineJson($fieldName, $valName, $indent),
             \Vi\Validation\Rules\MinRule::class => $this->inlineMinMax($rule, $fieldName, $valName, 'min', '<', $indent),
             \Vi\Validation\Rules\MaxRule::class => $this->inlineMinMax($rule, $fieldName, $valName, 'max', '>', $indent),
-            \Vi\Validation\Rules\AlphaRule::class => $this->inlineRegex($fieldName, $valName, 'alpha', '/^[a-zA-Z]+$/', $indent),
-            \Vi\Validation\Rules\AlphaNumRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_num', '/^[a-zA-Z0-9]+$/', $indent),
-            \Vi\Validation\Rules\AlphaDashRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_dash', '/^[a-zA-Z0-9_-]+$/', $indent),
+            \Vi\Validation\Rules\AlphaRule::class => $this->inlineRegex($fieldName, $valName, 'alpha', '/^\pL+$/u', $indent),
+            \Vi\Validation\Rules\AlphaNumRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_num', '/^[\pL\pN]+$/u', $indent),
+            \Vi\Validation\Rules\AlphaDashRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_dash', '/^[\pL\pM\pN_-]+$/u', $indent),
             default => null,
         };
+
+        if ($code === null) {
+            return null;
+        }
+
+        return $prefix . $code . $suffix;
+    }
+
+    private function isImplicitRule(string $class): bool
+    {
+        return in_array($class, [
+            \Vi\Validation\Rules\RequiredRule::class,
+            \Vi\Validation\Rules\RequiredIfRule::class,
+            \Vi\Validation\Rules\RequiredUnlessRule::class,
+            \Vi\Validation\Rules\RequiredWithRule::class,
+            \Vi\Validation\Rules\RequiredWithAllRule::class,
+            \Vi\Validation\Rules\RequiredWithoutRule::class,
+            \Vi\Validation\Rules\RequiredWithoutAllRule::class,
+            \Vi\Validation\Rules\AcceptedRule::class,
+            \Vi\Validation\Rules\AcceptedIfRule::class,
+            \Vi\Validation\Rules\FilledRule::class,
+            \Vi\Validation\Rules\PresentRule::class,
+            \Vi\Validation\Rules\ProhibitedRule::class,
+            \Vi\Validation\Rules\ProhibitedIfRule::class,
+            \Vi\Validation\Rules\ProhibitedUnlessRule::class,
+        ], true);
+    }
+
+    private function inlineInteger(string $fieldName, string $valName, string $indent): string
+    {
+        return "{$indent}if (!is_int({$valName}) && !(is_string({$valName}) && preg_match('/^-?\d+$/', {$valName}))) {\n" .
+               "{$indent}    \$errors['" . addslashes($fieldName) . "'][] = ['rule' => 'integer', 'message' => null];\n" .
+               "{$indent}    \$hasErrors = true;\n" .
+               "{$indent}}\n";
     }
 
     private function inlineRequired(string $fieldName, string $valName, string $indent): string
@@ -211,7 +258,7 @@ final class NativeCompiler
     private function inlineRegex(string $fieldName, string $valName, string $ruleName, string $pattern, string $indent): string
     {
         $patternExport = var_export($pattern, true);
-        return "{$indent}if ({$valName} !== null && (!is_string({$valName}) || !preg_match({$patternExport}, {$valName}))) {\n" .
+        return "{$indent}if ({$valName} !== null && (!is_string({$valName}) || !preg_match({$patternExport}, (string){$valName}))) {\n" .
                "{$indent}    \$errors['" . addslashes($fieldName) . "'][] = ['rule' => '{$ruleName}', 'message' => null];\n" .
                "{$indent}    \$hasErrors = true;\n" .
                "{$indent}}\n";
@@ -224,15 +271,15 @@ final class NativeCompiler
 
         return "{$indent}if ({$valName} !== null) {\n" .
                "{$indent}    \$invalid = false;\n" .
-               "{$indent}    if (is_array({$valName})) {\n" .
+               "{$indent}    if (is_numeric({$valName})) {\n" .
+               "{$indent}        if ((float){$valName} {$op} {$limitExport}) \$invalid = true;\n" .
+               "{$indent}        \$type_tag = 'numeric';\n" .
+               "{$indent}    } elseif (is_array({$valName})) {\n" .
                "{$indent}        if (count({$valName}) {$op} {$limitExport}) \$invalid = true;\n" .
                "{$indent}        \$type_tag = 'array';\n" .
                "{$indent}    } elseif (is_string({$valName})) {\n" .
                "{$indent}        if (mb_strlen({$valName}) {$op} {$limitExport}) \$invalid = true;\n" .
                "{$indent}        \$type_tag = 'string';\n" .
-               "{$indent}    } elseif (is_numeric({$valName})) {\n" .
-               "{$indent}        if ((float){$valName} {$op} {$limitExport}) \$invalid = true;\n" .
-               "{$indent}        \$type_tag = 'numeric';\n" .
                "{$indent}    } else {\n" .
                "{$indent}        \$type_tag = 'numeric';\n" .
                "{$indent}    }\n" .

@@ -15,10 +15,28 @@ final class IntegerTypeRule implements RuleInterface
             return null;
         }
 
-        if (!is_int($value)) {
-            return ['rule' => 'integer'];
+        if ($this->isInt($value)) {
+            return null;
         }
 
-        return null;
+        return ['rule' => 'integer'];
+
+    }
+
+    private function isInt(mixed $value): bool
+    {
+         if (is_int($value)) {
+            return true;
+        }
+
+        if (!is_string($value) || $value === "") {
+            return false;
+        }
+
+        if ($value[0] === "-") {
+            return strlen($value) > 1 && ctype_digit(substr($value, 1));
+        }
+
+        return ctype_digit($value);
     }
 }

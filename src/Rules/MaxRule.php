@@ -7,13 +7,19 @@ namespace Vi\Validation\Rules;
 use Vi\Validation\Execution\ValidationContext;
 
 #[RuleName(RuleId::MAX)]
-final class MaxRule implements RuleInterface
+final class MaxRule implements RuleInterface, NumericAwareInterface
 {
     private int|float $max;
+    private bool $isNumeric = false;
 
     public function __construct(int|float $max)
     {
         $this->max = $max;
+    }
+
+    public function setNumeric(bool $numeric): void
+    {
+        $this->isNumeric = $numeric;
     }
 
     public function validate(mixed $value, string $field, ValidationContext $context): ?array
@@ -30,8 +36,16 @@ final class MaxRule implements RuleInterface
         }
 
         if (is_string($value)) {
+            // If explicit numeric context is set and value is numeric, treat as number
+            if ($this->isNumeric && is_numeric($value)) {
+                if ($value > $this->max) {
+                    return ['rule' => 'max', 'params' => ['type' => 'numeric', 'max' => $this->max]];
+                }
+                return null;
+            }
+
             if (mb_strlen($value) > $this->max) {
-            return ['rule' => 'max', 'params' => ['type' => 'string', 'max' => $this->max]];
+                return ['rule' => 'max', 'params' => ['type' => 'string', 'max' => $this->max]];
             }
             return null;
         }

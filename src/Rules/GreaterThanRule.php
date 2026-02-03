@@ -7,13 +7,19 @@ namespace Vi\Validation\Rules;
 use Vi\Validation\Execution\ValidationContext;
 
 #[RuleName(RuleId::GT)]
-final class GreaterThanRule implements RuleInterface
+final class GreaterThanRule implements RuleInterface, NumericAwareInterface
 {
     private string $otherField;
+    private bool $isNumeric = false;
 
     public function __construct(string $otherField)
     {
         $this->otherField = $otherField;
+    }
+
+    public function setNumeric(bool $numeric): void
+    {
+        $this->isNumeric = $numeric;
     }
 
     public function validate(mixed $value, string $field, ValidationContext $context): ?array
@@ -30,17 +36,31 @@ final class GreaterThanRule implements RuleInterface
 
         // Handle numeric comparison
         if (is_numeric($value) && is_numeric($otherValue)) {
-            if ((float) $value <= (float) $otherValue) {
-                return [
-                    'rule' => 'gt',
-                    'params' => ['value' => $this->otherField],
-                ];
+            // Force numeric comparison if context is set or both are naturally numeric
+            if ($this->isNumeric || (is_int($value) && is_int($otherValue)) || (is_float($value) && is_float($otherValue)) || (is_int($value) && is_float($otherValue)) || (is_float($value) && is_int($otherValue))) {
+                if ((float) $value <= (float) $otherValue) {
+                    return [
+                        'rule' => 'gt',
+                        'params' => ['value' => $this->otherField],
+                    ];
+                }
+                return null;
             }
-            return null;
         }
 
         // Handle string comparison (by length)
         if (is_string($value) && is_string($otherValue)) {
+            // If explicit numeric context, try to compare as numbers first
+            if ($this->isNumeric && is_numeric($value) && is_numeric($otherValue)) {
+                 if ((float) $value <= (float) $otherValue) {
+                    return [
+                        'rule' => 'gt',
+                        'params' => ['value' => $this->otherField],
+                    ];
+                }
+                return null;
+            }
+
             if (mb_strlen($value) <= mb_strlen($otherValue)) {
                 return [
                     'rule' => 'gt',

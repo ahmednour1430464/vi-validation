@@ -15,6 +15,9 @@ use Vi\Validation\Schema\SchemaBuilder;
 use Vi\Validation\SchemaValidator;
 
 use Vi\Validation\Rules\RuleRegistry;
+use Vi\Validation\Rules\IntegerTypeRule;
+use Vi\Validation\Rules\NumericRule;
+use Vi\Validation\Rules\NumericAwareInterface;
 
 final class FastValidatorFactory
 {
@@ -94,6 +97,25 @@ final class FastValidatorFactory
         foreach ($rules as $field => $definition) {
             $fieldBuilder = $builder->field($field);
             $parsedRules = $parser->parse($definition);
+            
+            // Check for numeric context
+            $isNumeric = false;
+            foreach ($parsedRules as $rule) {
+                if ($rule instanceof IntegerTypeRule || $rule instanceof NumericRule || ($rule instanceof \Vi\Validation\Rules\IntegerRule)) {
+                    $isNumeric = true;
+                    break;
+                }
+            }
+            
+            // Apply numeric context to aware rules
+            if ($isNumeric) {
+                foreach ($parsedRules as $rule) {
+                    if ($rule instanceof NumericAwareInterface) {
+                        $rule->setNumeric(true);
+                    }
+                }
+            }
+
             $fieldBuilder->rules(...$parsedRules);
         }
 

@@ -7,15 +7,21 @@ namespace Vi\Validation\Rules;
 use Vi\Validation\Execution\ValidationContext;
 
 #[RuleName(RuleId::BETWEEN)]
-final class BetweenRule implements RuleInterface
+final class BetweenRule implements RuleInterface, NumericAwareInterface
 {
     private int|float $min;
     private int|float $max;
+    private bool $isNumeric = false;
 
     public function __construct(int|float $min, int|float $max)
     {
         $this->min = $min;
         $this->max = $max;
+    }
+
+    public function setNumeric(bool $numeric): void
+    {
+        $this->isNumeric = $numeric;
     }
 
     public function validate(mixed $value, string $field, ValidationContext $context): ?array
@@ -44,10 +50,16 @@ final class BetweenRule implements RuleInterface
     private function getSize(mixed $value): int|float
     {
         if (is_numeric($value)) {
-            return (float) $value;
+            // If explicitly numeric or naturally numeric
+            if ($this->isNumeric || is_int($value) || is_float($value)) {
+                return (float) $value;
+            }
         }
 
         if (is_string($value)) {
+            if ($this->isNumeric && is_numeric($value)) {
+                return (float) $value;
+            }
             return mb_strlen($value);
         }
 
