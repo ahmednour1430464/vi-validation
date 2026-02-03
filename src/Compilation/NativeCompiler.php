@@ -269,17 +269,24 @@ final class NativeCompiler
         $limit = $this->getProperty($rule, $ruleName);
         $limitExport = var_export($limit, true);
 
+        $isNumeric = false;
+        try {
+            $isNumeric = $this->getProperty($rule, 'isNumeric');
+        } catch (\Exception $e) {
+            // Property might not exist or be accessible, default false
+        }
+        
         return "{$indent}if ({$valName} !== null) {\n" .
                "{$indent}    \$invalid = false;\n" .
-               "{$indent}    if (is_numeric({$valName})) {\n" .
+               "{$indent}    if (" . ($isNumeric ? "is_numeric({$valName})" : "(is_int({$valName}) || is_float({$valName}))") . ") {\n" .
                "{$indent}        if ((float){$valName} {$op} {$limitExport}) \$invalid = true;\n" .
                "{$indent}        \$type_tag = 'numeric';\n" .
-               "{$indent}    } elseif (is_array({$valName})) {\n" .
-               "{$indent}        if (count({$valName}) {$op} {$limitExport}) \$invalid = true;\n" .
-               "{$indent}        \$type_tag = 'array';\n" .
                "{$indent}    } elseif (is_string({$valName})) {\n" .
                "{$indent}        if (mb_strlen({$valName}) {$op} {$limitExport}) \$invalid = true;\n" .
                "{$indent}        \$type_tag = 'string';\n" .
+               "{$indent}    } elseif (is_array({$valName})) {\n" .
+               "{$indent}        if (count({$valName}) {$op} {$limitExport}) \$invalid = true;\n" .
+               "{$indent}        \$type_tag = 'array';\n" .
                "{$indent}    } else {\n" .
                "{$indent}        \$type_tag = 'numeric';\n" .
                "{$indent}    }\n" .

@@ -37,7 +37,7 @@ final class GreaterThanRule implements RuleInterface, NumericAwareInterface
         // Handle numeric comparison
         if (is_numeric($value) && is_numeric($otherValue)) {
             // Force numeric comparison if context is set or both are naturally numeric
-            if ($this->isNumeric || (is_int($value) && is_int($otherValue)) || (is_float($value) && is_float($otherValue)) || (is_int($value) && is_float($otherValue)) || (is_float($value) && is_int($otherValue))) {
+            if ($this->isNumeric || (is_numeric($value) && is_numeric($otherValue))) {
                 if ((float) $value <= (float) $otherValue) {
                     return [
                         'rule' => 'gt',
