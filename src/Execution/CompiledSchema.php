@@ -13,6 +13,8 @@ final class CompiledSchema
 
     private array $rulesArray;
 
+    private ?ValidatorEngine $engine = null;
+
     /** @param list<CompiledField> $fields */
     private function __construct(array $fields, array $rulesArray = [])
     {
