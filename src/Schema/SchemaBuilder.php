@@ -8,6 +8,9 @@ use Vi\Validation\Execution\CompiledSchema;
 
 final class SchemaBuilder
 {
+    /** @var array<string, FieldDefinition> */
+    private array $fields = [];
+
     /** @var array<string, mixed> */
     private array $rulesArray = [];
 
