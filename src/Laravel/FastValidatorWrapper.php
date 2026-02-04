@@ -37,14 +37,18 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     private bool $stopOnFirstFailure = false;
 
+    private ?\Vi\Validation\Rules\RuleRegistry $registry;
+
     /**
      * @param iterable<string, mixed> $data Array or generator of data to validate
      */
-    public function __construct(SchemaValidator $validator, iterable $data)
+    public function __construct(SchemaValidator $validator, iterable $data, ?\Vi\Validation\Rules\RuleRegistry $registry = null)
     {
         $this->validator = $validator;
         $this->data = $data;
+        $this->registry = $registry;
     }
+
 
     /**
      * Materialize the data to an array if it's a generator/iterator.
@@ -74,9 +78,11 @@ final class FastValidatorWrapper implements LaravelValidatorContract
     public function passes(): bool
     {
         if ($this->result === null) {
+            $this->applyConditionalRules();
             $this->result = $this->validator->validate($this->materializeData());
             
             // Execute after callbacks
+
             foreach ($this->afterCallbacks as $callback) {
                 $callback($this);
             }
@@ -103,6 +109,9 @@ final class FastValidatorWrapper implements LaravelValidatorContract
         return $bag;
     }
 
+    /** @var array<array{0: string, 1: string|array, 2: callable}> */
+    private array $conditionalRules = [];
+
     public function after($callback)
     {
         $this->afterCallbacks[] = $callback;
@@ -111,9 +120,54 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     public function sometimes($attribute, $rules, callable $callback)
     {
-        // TODO: Implement conditional rule application
+        $this->conditionalRules[] = [$attribute, $rules, $callback];
+        $this->result = null;
         return $this;
     }
+
+    private function applyConditionalRules(): void
+    {
+        if (empty($this->conditionalRules)) {
+            return;
+        }
+
+        $data = $this->materializeData();
+        $rulesArray = $this->validator->getSchema()->getRulesArray();
+        $changed = false;
+
+        foreach ($this->conditionalRules as [$attribute, $rules, $callback]) {
+            if ($callback($data)) {
+                $currentRules = $rulesArray[$attribute] ?? [];
+                if (is_string($currentRules)) {
+                    $currentRules = explode('|', $currentRules);
+                }
+                
+                $additionalRules = is_string($rules) ? explode('|', $rules) : (array)$rules;
+                
+                $rulesArray[$attribute] = array_merge($currentRules, $additionalRules);
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
+            // Re-build validator with new rules
+            $parser = new LaravelRuleParser($this->registry);
+            $builder = new \Vi\Validation\Schema\SchemaBuilder();
+            $builder->setRulesArray($rulesArray);
+
+            foreach ($rulesArray as $field => $definition) {
+                $fieldBuilder = $builder->field($field);
+                $parsedRules = $parser->parse($definition);
+                $fieldBuilder->rules(...$parsedRules);
+            }
+
+            $this->validator = new SchemaValidator($builder->compile());
+        }
+
+        $this->conditionalRules = [];
+    }
+
+
 
     public function getMessageBag()
     {
@@ -184,8 +238,9 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     public function sometimesWith($attribute, $rules, callable $callback)
     {
-        return $this;
+        return $this->sometimes($attribute, $rules, $callback);
     }
+
 
     /**
      * Get the validation rules.

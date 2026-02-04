@@ -59,8 +59,9 @@ final class FastValidatorFactory
     ): FastValidatorWrapper {
         $schemaValidator = $this->buildSchemaValidator($rules, $messages, $attributes);
 
-        return new FastValidatorWrapper($schemaValidator, $data);
+        return new FastValidatorWrapper($schemaValidator, $data, $this->registry);
     }
+
 
     /**
      * Get or create schema cache instance.

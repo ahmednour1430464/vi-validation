@@ -30,9 +30,10 @@ final class SchemaValidator
     }
 
     /**
-     * @param array<string, mixed> $rules
+     * @param array<string, mixed> $rulesArray
      */
     public static function build(callable $definition, array $config = [], array $rulesArray = []): self
+
     {
         $builder = new SchemaBuilder();
         if (!empty($rulesArray)) {
@@ -49,9 +50,15 @@ final class SchemaValidator
         return new self($builder->compile(), null, $compiler);
     }
 
+    public function getSchema(): CompiledSchema
+    {
+        return $this->schema;
+    }
+
     private ?\Vi\Validation\Execution\NativeValidator $cachedNativeValidator = null;
 
     public function validate(array $data): ValidationResult
+
     {
         if ($this->cachedNativeValidator !== null) {
             return $this->cachedNativeValidator->validate($data);

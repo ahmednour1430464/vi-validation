@@ -601,7 +601,8 @@ final class FieldDefinition
         return $this;
     }
 
-    public function when($condition, callable $onTrue, ?callable $onFalse = null): self
+    public function when(mixed $condition, callable $onTrue, ?callable $onFalse = null): self
+
     {
         // We create a temporary builder to collect rules for onTrue and onFalse
         $trueBuilder = new SchemaBuilder();
