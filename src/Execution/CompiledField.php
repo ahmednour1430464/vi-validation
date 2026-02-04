@@ -160,6 +160,9 @@ final class CompiledField
         return false;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function getValue(array $data): mixed
     {
         if (!$this->isNested) {

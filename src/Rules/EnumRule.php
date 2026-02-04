@@ -10,9 +10,12 @@ use UnitEnum;
 #[RuleName(RuleId::ENUM)]
 final class EnumRule implements RuleInterface
 {
-    /** @var class-string<UnitEnum> */
+    /** @var class-string<\UnitEnum> */
     private string $enumClass;
 
+    /**
+     * @param class-string<\UnitEnum> $enumClass
+     */
     public function __construct(string $enumClass)
     {
         $this->enumClass = $enumClass;

@@ -10,6 +10,7 @@ use Vi\Validation\Execution\ValidationContext;
 final class ProhibitsRule implements RuleInterface
 {
     /** @var list<string> */
+    /** @var array<int|string, string> */
     private array $fields;
 
     public function __construct(string ...$fields)

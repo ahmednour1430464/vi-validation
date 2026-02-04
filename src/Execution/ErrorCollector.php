@@ -41,7 +41,7 @@ final class ErrorCollector
     }
 
     /**
-     * @return array<string, list<array{rule: string, message: string|null}>>
+     * @return array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>>
      */
     public function all(): array
     {

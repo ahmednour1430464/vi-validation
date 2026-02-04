@@ -14,7 +14,6 @@ final class PasswordRule implements RuleInterface
     private bool $letters = false;
     private bool $numbers = false;
     private bool $symbols = false;
-    private bool $uncompromised = false;
 
     public function min(int $min): self
     {
@@ -43,12 +42,6 @@ final class PasswordRule implements RuleInterface
     public function symbols(): self
     {
         $this->symbols = true;
-        return $this;
-    }
-
-    public function uncompromised(): self
-    {
-        $this->uncompromised = true;
         return $this;
     }
 

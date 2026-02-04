@@ -30,6 +30,10 @@ final class ValidatorEngine
         $this->maxErrors = $maxErrors;
     }
 
+    /**
+     * @param CompiledSchema $schema
+     * @param array<string, mixed> $data
+     */
     public function validate(CompiledSchema $schema, array $data): ValidationResult
     {
         if ($this->errors === null) {
@@ -37,14 +41,19 @@ final class ValidatorEngine
             $this->context = new ValidationContext($data, $this->errors);
         } else {
             $this->errors->reset();
-            $this->context->setData($data);
+            if ($this->context !== null) {
+                $this->context->setData($data);
+            } else {
+                $this->context = new ValidationContext($data, $this->errors);
+            }
         }
 
-        $this->context->setDatabaseValidator($this->databaseValidator);
-        $this->context->setPasswordHasher($this->passwordHasher);
+        /** @var ValidationContext $context */
+        $context = $this->context;
+        $context->setDatabaseValidator($this->databaseValidator);
+        $context->setPasswordHasher($this->passwordHasher);
 
         $errors = $this->errors;
-        $context = $this->context;
         $excludedFields = [];
 
         foreach ($schema->getFields() as $field) {
@@ -87,6 +96,7 @@ final class ValidatorEngine
                         break;
                     }
 
+                    /** @phpstan-ignore-next-line */
                     if ($this->shouldStopValidation($errors)) {
                         break;
                     }
@@ -166,8 +176,8 @@ final class ValidatorEngine
         $error = $rule->validate($value, $field, $context);
 
         if ($error !== null) {
-            $params = $error['parameters'] ?? $error['params'] ?? [];
-            $context->addError($field, $error['rule'], $error['message'] ?? null, $params);
+            $params = (array) ($error['parameters'] ?? $error['params'] ?? []);
+            $context->addError($field, (string)$error['rule'], $error['message'] ?? null, $params);
             return true;
         }
 

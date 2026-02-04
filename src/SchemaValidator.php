@@ -30,10 +30,10 @@ final class SchemaValidator
     }
 
     /**
+     * @param array<string, mixed> $config
      * @param array<string, mixed> $rulesArray
      */
     public static function build(callable $definition, array $config = [], array $rulesArray = []): self
-
     {
         $builder = new SchemaBuilder();
         if (!empty($rulesArray)) {
@@ -55,10 +55,17 @@ final class SchemaValidator
         return $this->schema;
     }
 
+    public function getEngine(): ValidatorEngine
+    {
+        return $this->engine;
+    }
+
     private ?\Vi\Validation\Execution\NativeValidator $cachedNativeValidator = null;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function validate(array $data): ValidationResult
-
     {
         if ($this->cachedNativeValidator !== null) {
             return $this->cachedNativeValidator->validate($data);
@@ -70,7 +77,7 @@ final class SchemaValidator
 
         if (file_exists($nativePath)) {
             $closure = require $nativePath;
-            if (is_callable($closure)) {
+            if ($closure instanceof \Closure) {
                 $this->cachedNativeValidator = new \Vi\Validation\Execution\NativeValidator($closure, $this->messageResolver);
                 return $this->cachedNativeValidator->validate($data);
             }

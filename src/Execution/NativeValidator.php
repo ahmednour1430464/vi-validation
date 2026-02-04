@@ -11,18 +11,24 @@ use Vi\Validation\Messages\MessageResolver;
  */
 final class NativeValidator
 {
-    /** @var \Closure */
-    private $closure;
+    /** @var \Closure(array<string, mixed>): array{errors: array<string, mixed>, excluded_fields: list<string>} */
+    private \Closure $closure;
     private ?MessageResolver $messageResolver;
 
-    public function __construct(callable $closure, ?MessageResolver $messageResolver = null)
+    /**
+     * @param \Closure(array<string, mixed>): array{errors: array<string, mixed>, excluded_fields: list<string>} $closure
+     * @param MessageResolver|null $messageResolver
+     */
+    public function __construct(\Closure $closure, ?MessageResolver $messageResolver = null)
     {
         $this->closure = $closure;
-        $this->messageResolver = $messageResolver ?? new MessageResolver();
+        $this->messageResolver = $messageResolver;
     }
 
     /**
      * Validate the given data using the precompiled closure.
+     *
+     * @param array<string, mixed> $data
      */
     public function validate(array $data): ValidationResult
     {

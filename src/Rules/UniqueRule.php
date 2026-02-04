@@ -13,15 +13,22 @@ final class UniqueRule implements RuleInterface
     private string $column;
     private mixed $ignoreId;
     private string $idColumn;
+    /** @phpstan-ignore-next-line */
+    private ?string $connection;
+    /** @var array<string, mixed> */
     private array $extraConstraints;
 
-    public function __construct(string $table, string $column = 'id', mixed $ignoreId = null, string $idColumn = 'id', array $extraConstraints = [])
+    /**
+     * @param array<string, mixed> $extraConstraints
+     */
+    public function __construct(string $table, string $column = 'id', mixed $ignoreId = null, string $idColumn = 'id', array $extraConstraints = [], ?string $connection = null)
     {
         $this->table = $table;
         $this->column = $column;
         $this->ignoreId = $ignoreId;
         $this->idColumn = $idColumn;
         $this->extraConstraints = $extraConstraints;
+        $this->connection = $connection;
     }
 
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

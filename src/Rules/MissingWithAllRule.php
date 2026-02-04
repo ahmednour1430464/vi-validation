@@ -10,6 +10,7 @@ use Vi\Validation\Execution\ValidationContext;
 final class MissingWithAllRule implements RuleInterface
 {
     /** @var list<string> */
+    /** @var array<int|string, string> */
     private array $others;
 
     public function __construct(string ...$others)

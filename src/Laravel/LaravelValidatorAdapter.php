@@ -20,9 +20,10 @@ final class LaravelValidatorAdapter implements LaravelValidatorFactory
 
     /**
      * Create a new Validator instance.
-     *
-     * @param iterable<array<string, mixed>> $rows Rows to validate
-     * @param array<string, mixed> $rules Validation rules
+     * @param iterable<string, mixed> $data
+     * @param array<string, mixed> $rules
+     * @param array<string, string> $messages
+     * @param array<string, string> $customAttributes
      */
     public function make(iterable $data, array $rules, array $messages = [], array $customAttributes = [])
     {
@@ -33,23 +34,42 @@ final class LaravelValidatorAdapter implements LaravelValidatorFactory
         return $fastValidator;
     }
 
-    public function extend($rule, $extension, $message = null)
+    /**
+     * @param string $rule
+     * @param \Closure|string $extension
+     * @param string|null $message
+     */
+    public function extend($rule, $extension, $message = null): void
     {
-        return $this->fallback->extend($rule, $extension, $message);
+        $this->fallback->extend($rule, $extension, $message);
     }
 
-    public function extendImplicit($rule, $extension, $message = null)
+    /**
+     * @param string $rule
+     * @param \Closure|string $extension
+     * @param string|null $message
+     */
+    public function extendImplicit($rule, $extension, $message = null): void
     {
-        return $this->fallback->extendImplicit($rule, $extension, $message);
+        $this->fallback->extendImplicit($rule, $extension, $message);
     }
 
-    public function replacer($rule, $replacer)
+    /**
+     * @param string $rule
+     * @param \Closure|string $replacer
+     */
+    public function replacer($rule, $replacer): void
     {
-        return $this->fallback->replacer($rule, $replacer);
+        $this->fallback->replacer($rule, $replacer);
     }
 
-    public function resolver($resolver)
+    /**
+     * @param \Closure|string $resolver
+     */
+    public function resolver($resolver): void
     {
-        return $this->fallback->resolver($resolver);
+        if (method_exists($this->fallback, 'resolver')) {
+            $this->fallback->resolver($resolver);
+        }
     }
 }

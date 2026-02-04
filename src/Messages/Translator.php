@@ -11,9 +11,6 @@ final class Translator implements TranslatorInterface
     /** @var array<string, array<string, string|array<string, string>>> */
     private array $messages = [];
 
-    /** @var array<string, array<string, string|array<string, string>>> */
-    private array $fallbackMessages = [];
-
     private string $fallbackLocale = 'en';
 
     private ?string $langPath = null;

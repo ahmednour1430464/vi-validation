@@ -4,3 +4,7 @@ parameters:
         - src
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#Function config(_path)? not found#'
+        - '#Class Laravel\\Octane\\Events\\.* not found#'
+        - '#Cannot access offset .events. on Illuminate\\Contracts\\Foundation\\Application#'

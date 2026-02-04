@@ -53,6 +53,9 @@ final class NativeCompiler
     /**
      * Generate a unique key for the rules that includes PHP version and compiler version.
      */
+    /**
+     * @param array<string, mixed> $rules
+     */
     public static function generateKey(array $rules): string
     {
         return sha1(serialize($rules) . PHP_VERSION_ID . self::COMPILER_VERSION);
@@ -147,7 +150,7 @@ final class NativeCompiler
 
         $code = match($class) {
             \Vi\Validation\Rules\RequiredRule::class => $this->inlineRequired($fieldName, $valName, $indent),
-            \Vi\Validation\Rules\StringRule::class => $this->inlineType($fieldName, $valName, 'string', 'is_string', $indent),
+            \Vi\Validation\Rules\StringTypeRule::class => $this->inlineType($fieldName, $valName, 'string', 'is_string', $indent),
             \Vi\Validation\Rules\IntegerTypeRule::class => $this->inlineInteger($fieldName, $valName, $indent),
             \Vi\Validation\Rules\NumericRule::class => $this->inlineType($fieldName, $valName, 'numeric', 'is_numeric', $indent),
             \Vi\Validation\Rules\BooleanRule::class => $this->inlineBoolean($fieldName, $valName, $indent),
@@ -159,7 +162,7 @@ final class NativeCompiler
             \Vi\Validation\Rules\MinRule::class => $this->inlineMinMax($rule, $fieldName, $valName, 'min', '<', $indent),
             \Vi\Validation\Rules\MaxRule::class => $this->inlineMinMax($rule, $fieldName, $valName, 'max', '>', $indent),
             \Vi\Validation\Rules\AlphaRule::class => $this->inlineRegex($fieldName, $valName, 'alpha', '/^\pL+$/u', $indent),
-            \Vi\Validation\Rules\AlphaNumRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_num', '/^[\pL\pN]+$/u', $indent),
+            \Vi\Validation\Rules\AlphanumericRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_num', '/^[\pL\pN]+$/u', $indent),
             \Vi\Validation\Rules\AlphaDashRule::class => $this->inlineRegex($fieldName, $valName, 'alpha_dash', '/^[\pL\pM\pN_-]+$/u', $indent),
             default => null,
         };

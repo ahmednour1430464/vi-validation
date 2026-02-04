@@ -11,13 +11,20 @@ final class ExistsRule implements RuleInterface
 {
     private string $table;
     private string $column;
+    /** @phpstan-ignore-next-line */
+    private ?string $connection;
+    /** @var array<string, mixed> */
     private array $extraConstraints;
 
-    public function __construct(string $table, string $column = 'id', array $extraConstraints = [])
+    /**
+     * @param array<string, mixed> $extraConstraints
+     */
+    public function __construct(string $table, string $column = 'id', array $extraConstraints = [], ?string $connection = null)
     {
         $this->table = $table;
         $this->column = $column;
         $this->extraConstraints = $extraConstraints;
+        $this->connection = $connection;
     }
 
     public function validate(mixed $value, string $field, ValidationContext $context): ?array

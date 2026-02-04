@@ -9,9 +9,12 @@ use Vi\Validation\Execution\ValidationContext;
 #[RuleName(RuleId::DIMENSIONS)]
 final class DimensionsRule implements RuleInterface
 {
-    /** @var array<string, int> */
+    /** @var array<string, mixed> */
     private array $constraints;
 
+    /**
+     * @param array<string, mixed> $constraints
+     */
     public function __construct(array $constraints)
     {
         $this->constraints = $constraints;
@@ -60,9 +63,13 @@ final class DimensionsRule implements RuleInterface
         }
 
         if (isset($this->constraints['ratio'])) {
-            [$targetWidth, $targetHeight] = explode('/', (string) $this->constraints['ratio']);
-            if (abs(($width / $height) - ($targetWidth / $targetHeight)) > 0.01) {
-                return ['rule' => 'dimensions'];
+            $ratioParts = explode('/', (string) $this->constraints['ratio']);
+            if (count($ratioParts) === 2) {
+                $targetWidth = (float) $ratioParts[0];
+                $targetHeight = (float) $ratioParts[1];
+                if ($targetHeight > 0 && abs(($width / $height) - ($targetWidth / $targetHeight)) > 0.01) {
+                    return ['rule' => 'dimensions'];
+                }
             }
         }
 

@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Vi\Validation\Laravel\Octane;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Octane\Events\RequestReceived;
-use Laravel\Octane\Events\RequestTerminated;
-use Laravel\Octane\Events\WorkerStarting;
-use Laravel\Octane\Events\WorkerStopping;
+// Octane classes imported but will be checked for existence
 use Vi\Validation\Runtime\ValidatorPool;
 use Vi\Validation\Runtime\ContextManager;
 
@@ -45,24 +42,32 @@ class OctaneValidatorProvider extends ServiceProvider
         $events = $this->app['events'];
 
         // Worker lifecycle events
-        $events->listen(WorkerStarting::class, function () {
-            $this->app->make(ValidatorPool::class)->onWorkerStart();
-            $this->app->make(ContextManager::class)->onWorkerStart();
-        });
+        if (class_exists('Laravel\Octane\Events\WorkerStarting')) {
+            $events->listen('Laravel\Octane\Events\WorkerStarting', function () {
+                $this->app->make(ValidatorPool::class)->onWorkerStart();
+                $this->app->make(ContextManager::class)->onWorkerStart();
+            });
+        }
 
-        $events->listen(WorkerStopping::class, function () {
-            $this->app->make(ValidatorPool::class)->onWorkerStop();
-            $this->app->make(ContextManager::class)->onWorkerStop();
-        });
+        if (class_exists('Laravel\Octane\Events\WorkerStopping')) {
+            $events->listen('Laravel\Octane\Events\WorkerStopping', function () {
+                $this->app->make(ValidatorPool::class)->onWorkerStop();
+                $this->app->make(ContextManager::class)->onWorkerStop();
+            });
+        }
 
         // Request lifecycle events
-        $events->listen(RequestReceived::class, function () {
-            $this->app->make(ContextManager::class)->onRequestStart();
-        });
+        if (class_exists('Laravel\Octane\Events\RequestReceived')) {
+            $events->listen('Laravel\Octane\Events\RequestReceived', function () {
+                $this->app->make(ContextManager::class)->onRequestStart();
+            });
+        }
 
-        $events->listen(RequestTerminated::class, function () {
-            $this->app->make(ContextManager::class)->onRequestEnd();
-        });
+        if (class_exists('Laravel\Octane\Events\RequestTerminated')) {
+            $events->listen('Laravel\Octane\Events\RequestTerminated', function () {
+                $this->app->make(ContextManager::class)->onRequestEnd();
+            });
+        }
     }
 
     private function isOctaneEnvironment(): bool

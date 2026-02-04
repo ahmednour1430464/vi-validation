@@ -32,7 +32,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     private ?ValidationResult $result = null;
 
-    /** @var array<callable> */
+    /** @var array<int, callable(self): void> */
     private array $afterCallbacks = [];
 
     private bool $stopOnFirstFailure = false;
@@ -79,6 +79,11 @@ final class FastValidatorWrapper implements LaravelValidatorContract
     {
         if ($this->result === null) {
             $this->applyConditionalRules();
+            
+            if ($this->stopOnFirstFailure) {
+                $this->validator->getEngine()->setFailFast(true);
+            }
+            
             $this->result = $this->validator->validate($this->materializeData());
             
             // Execute after callbacks
@@ -99,26 +104,36 @@ final class FastValidatorWrapper implements LaravelValidatorContract
             $this->passes();
         }
 
-        // Use proper messages from ValidationResult
-        foreach ($this->result->messages() as $field => $messages) {
-            foreach ($messages as $message) {
-                $bag->add($field, $message);
+        if ($this->result !== null) {
+            // Use proper messages from ValidationResult
+            foreach ($this->result->messages() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $bag->add($field, $message);
+                }
             }
         }
 
         return $bag;
     }
 
-    /** @var array<array{0: string, 1: string|array, 2: callable}> */
+    /** @var array<int, array{0: string, 1: string|array<int, mixed>, 2: callable(array<string, mixed>): bool}> */
     private array $conditionalRules = [];
 
-    public function after($callback)
+    /**
+     * @param callable(self): void $callback
+     */
+    public function after($callback): self
     {
         $this->afterCallbacks[] = $callback;
         return $this;
     }
 
-    public function sometimes($attribute, $rules, callable $callback)
+    /**
+     * @param string $attribute
+     * @param string|array<int, mixed> $rules
+     * @param callable(array<string, mixed>): bool $callback
+     */
+    public function sometimes($attribute, $rules, callable $callback): self
     {
         $this->conditionalRules[] = [$attribute, $rules, $callback];
         $this->result = null;
@@ -144,7 +159,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
                 
                 $additionalRules = is_string($rules) ? explode('|', $rules) : (array)$rules;
                 
-                $rulesArray[$attribute] = array_merge($currentRules, $additionalRules);
+                $rulesArray[$attribute] = array_merge((array)$currentRules, $additionalRules);
                 $changed = true;
             }
         }
@@ -169,12 +184,15 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
 
 
-    public function getMessageBag()
+    public function getMessageBag(): MessageBag
     {
         return $this->errors();
     }
 
-    public function validated()
+    /**
+     * @return array<string, mixed>
+     */
+    public function validated(): array
     {
         if ($this->fails()) {
             throw new ValidationException($this);
@@ -183,6 +201,9 @@ final class FastValidatorWrapper implements LaravelValidatorContract
         return $this->materializeData();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function validate(): array
     {
         if ($this->fails()) {
@@ -192,6 +213,9 @@ final class FastValidatorWrapper implements LaravelValidatorContract
         return $this->materializeData();
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function failed(): array
     {
         if ($this->result === null) {
@@ -199,16 +223,21 @@ final class FastValidatorWrapper implements LaravelValidatorContract
         }
 
         $failed = [];
-        foreach ($this->result->errors() as $field => $fieldErrors) {
-            foreach ($fieldErrors as $error) {
-                $failed[$field][$error['rule']] = [];
+        if ($this->result !== null) {
+            foreach ($this->result->errors() as $field => $fieldErrors) {
+                foreach ($fieldErrors as $error) {
+                    $failed[$field][$error['rule']] = [];
+                }
             }
         }
 
         return $failed;
     }
 
-    public function getData()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getData(): array
     {
         return $this->materializeData();
     }
@@ -229,14 +258,19 @@ final class FastValidatorWrapper implements LaravelValidatorContract
     /**
      * @param iterable<string, mixed> $data
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
         $this->materializedData = null;
         $this->result = null;
     }
 
-    public function sometimesWith($attribute, $rules, callable $callback)
+    /**
+     * @param string $attribute
+     * @param mixed $rules
+     * @param callable $callback
+     */
+    public function sometimesWith($attribute, $rules, callable $callback): self
     {
         return $this->sometimes($attribute, $rules, $callback);
     }
@@ -256,10 +290,11 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      * Set the validation rules.
      *
      * @param array<string, mixed> $rules
+     * @return $this
      */
     public function setRules(array $rules): self
     {
-        $this->rules = $rules;
+        $this->rules = array_merge($this->rules, $rules);
         $this->result = null;
         return $this;
     }
@@ -268,6 +303,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      * Add additional rules to the existing rules.
      *
      * @param array<string, mixed> $rules
+     * @return $this
      */
     public function addRules(array $rules): self
     {
@@ -290,6 +326,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      * Set custom messages for validation errors.
      *
      * @param array<string, string> $messages
+     * @return $this
      */
     public function setCustomMessages(array $messages): self
     {
@@ -311,6 +348,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
      * Set custom attributes for validation errors.
      *
      * @param array<string, string> $attributes
+     * @return $this
      */
     public function setCustomAttributes(array $attributes): self
     {
@@ -320,6 +358,9 @@ final class FastValidatorWrapper implements LaravelValidatorContract
 
     /**
      * Stop validation on first failure.
+     *
+     * @param bool $stop
+     * @return $this
      */
     public function stopOnFirstFailure(bool $stop = true): self
     {
@@ -394,7 +435,7 @@ final class FastValidatorWrapper implements LaravelValidatorContract
     {
         if (is_callable($rowsOrCallback)) {
             $this->validator->each($this->data, $rowsOrCallback);
-        } else {
+        } elseif ($callback !== null) {
             $this->validator->each($rowsOrCallback, $callback);
         }
     }

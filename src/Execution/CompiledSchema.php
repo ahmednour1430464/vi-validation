@@ -11,11 +11,15 @@ final class CompiledSchema
     /** @var list<CompiledField> */
     private array $fields;
 
+    /** @var array<string, mixed> */
     private array $rulesArray;
 
     private ?ValidatorEngine $engine = null;
 
-    /** @param list<CompiledField> $fields */
+    /**
+     * @param list<CompiledField> $fields
+     * @param array<string, mixed> $rulesArray
+     */
     private function __construct(array $fields, array $rulesArray = [])
     {
         $this->fields = $fields;

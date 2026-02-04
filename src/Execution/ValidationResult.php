@@ -11,12 +11,14 @@ final class ValidationResult
     /** @var array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>> */
     private array $errors;
     private ?MessageResolver $messageResolver;
+    /** @var array<string, mixed> */
     private array $data;
     /** @var list<string> */
     private array $excludedFields;
 
     /**
      * @param ErrorCollector|array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>> $errors
+     * @param array<string, mixed> $data
      * @param list<string> $excludedFields
      */
     public function __construct($errors, array $data = [], ?MessageResolver $messageResolver = null, array $excludedFields = [])
@@ -32,7 +34,7 @@ final class ValidationResult
     }
 
     /**
-     * Get the validated data (including excluded fields).
+     * @return array<string, mixed>
      */
     public function data(): array
     {
@@ -40,7 +42,7 @@ final class ValidationResult
     }
 
     /**
-     * Get the validated data excluding fields that were marked for exclusion.
+     * @return array<string, mixed>
      */
     public function validated(): array
     {
@@ -62,7 +64,7 @@ final class ValidationResult
     }
 
     /**
-     * @return array<string, list<array{rule: string, message: string|null}>>
+     * @return array<string, list<array{rule: string, params: array<string, mixed>, message: string|null}>>
      */
     public function errors(): array
     {

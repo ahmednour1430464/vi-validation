@@ -10,6 +10,7 @@ use Vi\Validation\Execution\ValidationContext;
 final class ExtensionsRule implements RuleInterface
 {
     /** @var list<string> */
+    /** @var array<int|string, string> */
     private array $extensions;
 
     public function __construct(string ...$extensions)

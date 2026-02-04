@@ -21,7 +21,6 @@ use Vi\Validation\Execution\ValidationContext;
 final class ClosureRule implements RuleInterface
 {
     private Closure $callback;
-    private ?string $failMessage = null;
 
     public function __construct(Closure $callback)
     {
@@ -30,18 +29,18 @@ final class ClosureRule implements RuleInterface
 
     public function validate(mixed $value, string $field, ValidationContext $context): ?array
     {
-        $this->failMessage = null;
+        $failMessage = null;
 
-        $fail = function (string $message): void {
-            $this->failMessage = $message;
+        $fail = function (string $message) use (&$failMessage): void {
+            $failMessage = $message;
         };
 
         ($this->callback)($field, $value, $fail);
 
-        if ($this->failMessage !== null) {
+        if ($failMessage !== null) {
             return [
                 'rule' => 'closure',
-                'message' => $this->failMessage,
+                'message' => $failMessage,
             ];
         }
 

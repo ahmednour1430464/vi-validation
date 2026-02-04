@@ -11,9 +11,6 @@ use Vi\Validation\Execution\ValidationContext;
 final class ImageRule implements RuleInterface
 {
     /** @var list<string> */
-    private const IMAGE_EXTENSIONS = ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'svg', 'webp'];
-
-    /** @var list<string> */
     private const IMAGE_MIMES = [
         'image/jpeg',
         'image/png',

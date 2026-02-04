@@ -26,10 +26,12 @@ final class FastValidatorFactory
 
     private ?SchemaCacheInterface $cache = null;
 
-    private ?ValidatorEngine $engine = null;
-
     private RuleRegistry $registry;
 
+    /**
+     * @param array<string, mixed> $config
+     * @param RuleRegistry|null $registry
+     */
     public function __construct(array $config = [], ?RuleRegistry $registry = null)
     {
         $this->config = $config;
@@ -40,7 +42,6 @@ final class FastValidatorFactory
         }
 
         $this->initializeCache();
-        $this->initializeEngine();
     }
 
     /**
@@ -102,7 +103,8 @@ final class FastValidatorFactory
             // Check for numeric context
             $isNumeric = false;
             foreach ($parsedRules as $rule) {
-                if ($rule instanceof IntegerTypeRule || $rule instanceof NumericRule || ($rule instanceof \Vi\Validation\Rules\IntegerRule)) {
+                $ruleClass = get_class($rule);
+                if ($ruleClass === \Vi\Validation\Rules\IntegerTypeRule::class || $ruleClass === \Vi\Validation\Rules\NumericRule::class) {
                     $isNumeric = true;
                     break;
                 }
@@ -131,6 +133,10 @@ final class FastValidatorFactory
         return $this->createValidatorWithSchema($schema, $messages, $attributes);
     }
 
+    /**
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     */
     private function createValidatorWithSchema(
         CompiledSchema $schema,
         array $messages = [],
@@ -142,6 +148,10 @@ final class FastValidatorFactory
         return new SchemaValidator($schema, $engine);
     }
 
+    /**
+     * @param array<string, string> $messages
+     * @param array<string, string> $attributes
+     */
     private function createEngine(array $messages = [], array $attributes = []): ValidatorEngine
     {
         $locale = $this->config['localization']['locale'] ?? 'en';
@@ -185,18 +195,9 @@ final class FastValidatorFactory
         }
     }
 
-    private function initializeEngine(): void
-    {
-        $failFast = $this->config['performance']['fail_fast'] ?? false;
-        $maxErrors = $this->config['performance']['max_errors'] ?? 100;
-        $locale = $this->config['localization']['locale'] ?? 'en';
-
-        $translator = new Translator($locale);
-        $messageResolver = new MessageResolver($translator);
-
-        $this->engine = new ValidatorEngine($messageResolver, $failFast, $maxErrors);
-    }
-
+    /**
+     * @param array<string, mixed> $rules
+     */
     private function generateCacheKey(array $rules): string
     {
         return md5($this->serializeRules($rules));
